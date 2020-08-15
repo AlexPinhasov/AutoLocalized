@@ -90,6 +90,7 @@ func validateMatchKeys(_ files: [LocalizationStringsFile]) {
         if let extraKey = Set(base.keys).symmetricDifference($0.keys).first {
             let incorrectFile = $0.keys.contains(extraKey) ? $0 : base
             printPretty("error: Found missing key: \(extraKey) in file: \(incorrectFile.path)")
+            exit(EXIT_FAILURE)
         }
     }
 }
@@ -108,6 +109,7 @@ func validateMissingKeys(_ codeFiles: [LocalizationCodeFile], localizationFiles:
         let extraKeys = keysToCompare.subtracting(baseKeys)
         if !extraKeys.isEmpty {
             printPretty("error: Found keys in code: \(extraKeys) from \($0.path), missing in strings file ")
+            exit(EXIT_FAILURE)
         }
     }
 }
@@ -178,6 +180,7 @@ struct ContentParser {
         return zip(keys, values).reduce(into: [String: String]()) { results, keyValue in
             if results[keyValue.0] != nil {
                 printPretty("error: Found duplicate key: \(keyValue.0) in file: \(path)")
+                exit(EXIT_FAILURE)
             }
             results[keyValue.0] = keyValue.1
         }
@@ -196,5 +199,6 @@ let codeFiles = localizedStringsInCode()
 validateMissingKeys(codeFiles, localizationFiles: stringFiles)
 validateDeadKeys(codeFiles, localizationFiles: stringFiles)
 
+exit(EXIT_SUCCESS)
 print("------------ SUCCESS ------------")
 
