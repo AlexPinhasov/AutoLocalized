@@ -59,6 +59,20 @@ func create() -> [LocalizationStringsFile] {
     return localizableFiles.map(LocalizationStringsFile.init(path:))
 }
 
+/// Writes back to localizable file with sorted keys and removed whitespaces and new lines
+func clean(stringFiles: [LocalizationStringsFile]) {
+    stringFiles.forEach({ localizeFile in
+        print("------------ 🧮 Sort and remove whitespaces: \(localizeFile.path) ------------")
+        let content = kv.keys.sorted().map { "\($0) = \(kv[$0]!);" }.joined(separator: "\n")
+        do {
+            try content.write(toFile: localizeFile.path, atomically: true, encoding: .utf8)
+        } catch {
+            print("error: ------------ ❌ Error: \(error) ------------")
+            exit(EXIT_FAILURE)
+        }
+    })
+}
+
 ///
 ///
 /// - Returns: A list of LocalizationCodeFile - contains path of file and all keys in it
@@ -83,8 +97,11 @@ func localizedStringsInCode() -> [LocalizationCodeFile] {
 ///
 /// - Parameter files: list of localizable files to validate
 func validateMatchKeys(_ files: [LocalizationStringsFile]) {
-    print("------------ Validating keys match in all localizable files ------------")
-    guard let base = files.first, files.count > 1 else { return }
+    print("------------ 📚 Validating keys match in all localizable files ------------")
+    guard let base = files.first, files.count > 1 else {
+        print("------------ 📚 Only 1 localize file found ------------")
+        return
+    }
     let files = Array(files.dropFirst())
     files.forEach {
         if let extraKey = Set(base.keys).symmetricDifference($0.keys).first {
@@ -131,74 +148,18 @@ func validateDeadKeys(_ codeFiles: [LocalizationCodeFile], localizationFiles: [L
     }
 }
 
-protocol Pathable {
-    var path: String { get }
-}
-
-struct LocalizationStringsFile: Pathable {
-    let path: String
-    let kv: [String: String]
-
-    var keys: [String] {
-        return Array(kv.keys)
-    }
-
-    init(path: String) {
-        self.path = path
-        self.kv = ContentParser.parse(path)
-    }
-
-    /// Writes back to localizable file with sorted keys and removed whitespaces and new lines
-    func cleanWrite() {
-        print("------------ Sort and remove whitespaces: \(path) ------------")
-        let content = kv.keys.sorted().map { "\($0) = \(kv[$0]!);" }.joined(separator: "\n")
-        try! content.write(toFile: path, atomically: true, encoding: .utf8)
-    }
-
-}
-
-struct LocalizationCodeFile: Pathable {
-    let path: String
-    let keys: Set<String>
-}
-
-struct ContentParser {
-
-    /// Parses contents of a file to localizable keys and values - Throws error if localizable file have duplicated keys
-    ///
-    /// - Parameter path: Localizable file paths
-    /// - Returns: localizable key and value for content at path
-    static func parse(_ path: String) -> [String: String] {
-        let content = contents(atPath: path)
-        let trimmed = content
-            .replacingOccurrences(of: "\n+", with: "", options: .regularExpression, range: nil)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        let keys = regexFor("\"([^\"]*?)\"(?= =)", content: trimmed)
-        let values = regexFor("(?<== )\"(.*?)\"(?=;)", content: trimmed)
-        if keys.count != values.count { fatalError("Error parsing contents: Make sure all keys and values are in correct format without comments in file") }
-        print("------------ Validating for duplicate keys: \(path) ------------")
-        return zip(keys, values).reduce(into: [String: String]()) { results, keyValue in
-            if results[keyValue.0] != nil {
-                printPretty("error: Found duplicate key: \(keyValue.0) in file: \(path)")
-                exit(EXIT_FAILURE)
-            }
-            results[keyValue.0] = keyValue.1
-        }
-    }
-}
-
 func printPretty(_ string: String) {
     print(string.replacingOccurrences(of: "\\", with: ""))
 }
 
 let stringFiles = create()
 validateMatchKeys(stringFiles)
-stringFiles.forEach { $0.cleanWrite() }
+clean(stringFiles)
 
 let codeFiles = localizedStringsInCode()
 validateMissingKeys(codeFiles, localizationFiles: stringFiles)
 validateDeadKeys(codeFiles, localizationFiles: stringFiles)
 
-exit(EXIT_SUCCESS)
 print("------------ SUCCESS ------------")
+exit(EXIT_SUCCESS)
 
