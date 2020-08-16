@@ -67,13 +67,13 @@ func clean(_ stringFiles: [LocalizationStringsFile]) {
             if let value = localizeFile.kv[$0] {
                 return "\($0) = \(value);"
             }
-            print("------------ ⚠️ Cant find value for key -> \($0)")
+            printPretty("\(currentPath)/\(localizeFile.path):1: warning: ------------ ⚠️ Cant find value for key -> \($0)")
             return nil
         }.joined(separator: "\n")
         do {
             try content.write(toFile: localizeFile.path, atomically: true, encoding: .utf8)
         } catch {
-            print("error: ------------ ❌ Error: \(error) ------------")
+            printPretty("\(currentPath)/\(localizeFile.path):1: error: ------------ ❌ Error: \(error) ------------")
             exit(EXIT_FAILURE)
         }
     })
@@ -110,9 +110,9 @@ func validateMatchKeys(_ files: [LocalizationStringsFile]) {
     }
     let files = Array(files.dropFirst())
     files.forEach {
-        if let extraKey = Set(base.keys).symmetricDifference($0.keys).first {
-            let incorrectFile = $0.keys.contains(extraKey) ? $0 : base
-            printPretty("error: Found missing key: \(extraKey) in file: \(incorrectFile.path)")
+        if let extraKey = base.keys.symmetricDifference($0.keys).first {
+            let incorrectFile = $0.keys.contains(extraKey) ? base : $0
+            printPretty("\(currentPath)/\(incorrectFile.path) error: Found missing key: \(extraKey) in file: \(incorrectFile.path)")
             exit(EXIT_FAILURE)
         }
     }
@@ -126,7 +126,7 @@ func validateMatchKeys(_ files: [LocalizationStringsFile]) {
 func validateMissingKeys(_ codeFiles: [LocalizationCodeFile], localizationFiles: [LocalizationStringsFile]) {
     print("------------ Checking for missing keys -----------")
     guard let baseFile = localizationFiles.first else { fatalError("Could not locate base localization file") }
-    let baseKeys = Set(baseFile.keys.map({ $0.replacingOccurrences(of: "\"", with: "") }))
+    let baseKeys = Set(baseFile.keys).map({ $0.replacingOccurrences(of: "\"", with: "")})
     codeFiles.forEach {
         let keysToCompare = $0.keys
         let extraKeys = keysToCompare.subtracting(baseKeys)
@@ -155,7 +155,7 @@ func validateDeadKeys(_ codeFiles: [LocalizationCodeFile], localizationFiles: [L
 }
 
 func printPretty(_ string: String) {
-    print(string.replacingOccurrences(of: "\\", with: ""))
+    print("\(string.replacingOccurrences(of: "\\", with: ""))")
 }
 
 let stringFiles = create()

@@ -11,10 +11,9 @@ struct LocalizationStringsFile {
     let path: String
     let kv: [String: String]
 
-    var keys: [String] {
-        return Array(kv.keys)
+    var keys: Set<String> {
+        Set(Array(kv.keys))
     }
-
     init(path: String) {
         self.path = path
         self.kv = ContentParser.parse(path)
