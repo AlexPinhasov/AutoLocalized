@@ -17,8 +17,9 @@ struct ContentParser {
         var foundErrorInRegex = false
 
         var rows: [Row] = rowsInFile.enumerated().compactMap({ index, rowString in
-            let rowString = rowString.replacingOccurrences(of: "\n+", with: "", options: .regularExpression, range: nil).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !rowString.isEmpty else { return nil }
 
+            let rowString = rowString.replacingOccurrences(of: "\n+", with: "", options: .regularExpression, range: nil).trimmingCharacters(in: .whitespacesAndNewlines)
             let keys = regexFor("\"([^\"]*?)\"(?= =)", content: rowString)
             let values = regexFor("(?<== )\"(.*?)\"(?=;)", content: rowString)
 
@@ -37,7 +38,7 @@ struct ContentParser {
         })
 
         guard !foundErrorInRegex else { exit(EXIT_FAILURE) }
-        print("------------ 🧮 Sort and remove whitespaces: \(path) ------------")
+        print("------------ 🧮 Sort: \(path) ------------")
         rows.sort(by: { $0.key < $1.key })
         rows.enumerated().forEach({ index, row in
             row.number = index

@@ -85,7 +85,7 @@ func validateMissingKeys(from codeFiles: [File], in localizationFiles: [Localiza
 
 /// Throws warning if keys exist in localizable file but are not being used
 ///
-/// - Parametersž
+/// - Parameters
 ///   - codeFiles: Array of LocalizationCodeFile
 ///   - localizationFiles: Array of LocalizableStringFiles
 func validateDeadKeys(from codeFiles: [File], in localizationFiles: [LocalizationStringsFile]) {
@@ -97,7 +97,9 @@ func validateDeadKeys(from codeFiles: [File], in localizationFiles: [Localizatio
     let baseKeys = Set(baseFile.rows)
     let deadKeys = baseKeys.subtracting(allCodeFileKeys)
     deadKeys.forEach({ row in
-        print("\(fileManager.currentDirectoryPath)/\(baseFile.path):\(row.number): warning: Dead 🔑 \"\(row.key)\" located in -> 📁 \(baseFile.path), missing in strings file.")
+        localizationFiles.forEach({ file in
+            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number + 1): warning: Dead 🔑 \"\(row.key)\",not being used.")
+        })
     })
 }
 
