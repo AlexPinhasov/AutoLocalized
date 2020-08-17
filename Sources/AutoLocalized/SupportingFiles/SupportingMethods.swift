@@ -11,9 +11,19 @@ import Foundation
 ///
 /// - Parameter path: path of file
 /// - Returns: content in file
-func contents(atPath path: String) -> [String] {
+func allStringRows(atPath path: String) -> [String] {
     guard let data = fileManager.contents(atPath: path),
         let content = String(data: data, encoding: .utf8)?.components(separatedBy: .newlines)
+        else { fatalError("Could not read from path: \(path)") }
+    return content
+}
+
+/// Reads contents in path
+///
+/// - Parameter path: path of file
+/// - Returns: content in file
+func content(atPath path: String) -> String {
+    guard let data = fileManager.contents(atPath: path), let content = String(data: data, encoding: .utf8)
         else { fatalError("Could not read from path: \(path)") }
     return content
 }
@@ -33,18 +43,14 @@ func regexFor(_ pattern: String, content: String, rangeIndex: Int = 0) -> [Strin
     }
 }
 
-func printPretty(_ string: String) {
-    print("\(string.replacingOccurrences(of: "\\", with: ""))")
-}
-
-/// Writes back to localizable file with sorted keys and removed whitespaces and new lines
+/// Writes back to localizable file
 func writeSorted(_ stringFiles: [LocalizationStringsFile]) {
     stringFiles.forEach({ localizeFile in
         let content = localizeFile.rows.compactMap { "\"\($0.key)\" = \"\($0.value)\";" }.joined(separator: "\n")
         do {
             try content.write(toFile: localizeFile.path, atomically: true, encoding: .utf8)
         } catch {
-            printPretty("\(fileManager.currentDirectoryPath)/\(localizeFile.path):1: error: ------------ ❌ Error: \(error) ------------")
+            print("\(fileManager.currentDirectoryPath)/\(localizeFile.path):1: error: ------------ ❌ Error: \(error) ------------")
             exit(EXIT_FAILURE)
         }
     })
@@ -55,7 +61,7 @@ func writeSorted(_ stringFiles: [LocalizationStringsFile]) {
 /// - Returns: A list of Files - contains path of file and all keys in it
 func getFilesWithLocalizationKeys(in executableFiles: [File]) -> [File] {
     executableFiles.forEach { file in
-        file.rows = contents(atPath: file.path).enumerated().compactMap({ index, stringRow in
+        file.rows = allStringRows(atPath: file.path).enumerated().compactMap({ index, stringRow in
             var regexString = ""
 
             if file.path.contains("xib") || file.path.contains("storyboard") {

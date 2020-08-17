@@ -1,7 +1,6 @@
 #!/usr/bin/xcrun --sdk macosx swift
 
 import Foundation
-import Darwin
 
 // We drop the first argument, which is the script execution path.
 let arguments: [String] = Array(CommandLine.arguments.dropFirst())
@@ -21,98 +20,46 @@ var pathFiles: [String] = {
     return files
 }()
 
+// MARK: - Localization Files
+
 /// List of localizable files - not including Localizable files in the Pods
 var localizableFiles: [LocalizationStringsFile] = {
-    let files = pathFiles.filter { $0.hasSuffix("Localize.strings") && !$0.contains("Pods") }.map(LocalizationStringsFile.init(path:))
-    guard files.count > 1 else {
-        print("------------ 📚 Only 1 localize file found ------------")
-        exit(EXIT_SUCCESS)
-    }
-    return files
+    return pathFiles.filter { $0.hasSuffix("Localize.strings") && !$0.contains("Pods") }.map(LocalizationStringsFile.init(path:))
 }()
+
+// MARK: - Other Files
 
 /// List of executable files
 var projectFiles: [File] = {
-    return pathFiles.filter { (!$0.localizedCaseInsensitiveContains("test") && NSString(string: $0).pathExtension == "swift"  && !NSString(string: $0).contains("Pods")) && NSString(string: $0).contains("Selina/Localization/Enums") || NSString(string: $0).pathExtension == "xib" || NSString(string: $0).pathExtension == "storyboard"}.compactMap({ File(path: $0, rows: []) })
+    func shouldUseFile(atPath path: String) -> Bool {
+        return (NSString(string: path).pathExtension != "strings"
+                && !path.localizedCaseInsensitiveContains("test")
+                && NSString(string: path).pathExtension == "swift"
+                && !NSString(string: path).contains("Pods")
+                && NSString(string: path).contains("Selina/")
+                )
+                || NSString(string: path).pathExtension == "xib"
+                || NSString(string: path).pathExtension == "storyboard"
+    }
+
+    func shouldIgnoreFile(atPath path: String) -> Bool {
+        return regexFor("// autolocalized:disable", content: content(atPath: path), rangeIndex: 0).count != 1
+    }
+
+    return pathFiles.filter({ shouldUseFile(atPath: $0) && shouldIgnoreFile(atPath: $0) }).compactMap({ File(path: $0, rows: []) })
 }()
 
-/// Throws error is ALL localizable files does not have matching keys
-///
-/// - Parameter files: list of localizable files to validate
-func validateLocalizationKeysMatch(in files: [LocalizationStringsFile]) {
-    print("------------ 📚 Validating keys match in all localizable files ------------")
-    guard let baseEnglishLocalization = files.first else { return }
-    let files = Array(files.suffix(from: 1))
-    let baseSet = Set(baseEnglishLocalization.rows)
-    files.forEach { file in
-        let fileSet = Set(file.rows)
+// MARK: - Execution
 
-        let currentFileExtraKeysRows = fileSet.subtracting(baseSet)
-        let englishFileExtraKeysRows = baseSet.subtracting(fileSet)
-
-        currentFileExtraKeysRows.forEach({ row in
-            print("\(currentPath)/\(baseEnglishLocalization.path):\(row.number + 1): error: 🔑 \"\(row.key)\" appear in other localization files but is missing here.")
-        })
-
-        englishFileExtraKeysRows.forEach({ row in
-            print("\(currentPath)/\(file.path):\(row.number + 1): error: 🔑 \"\(row.key)\" appear in other localization files but is missing here.")
-        })
-
-        guard !currentFileExtraKeysRows.isEmpty || !englishFileExtraKeysRows.isEmpty else { return }
-        scriptFinishedWithoutErrors = false
-    }
-}
-
-/// Throws error if localizable files are missing keys
-///
-/// - Parameters:
-///   - codeFiles: Array of LocalizationCodeFile
-///   - localizationFiles: Array of LocalizableStringFiles
-func validateMissingKeys(from codeFiles: [File], in localizationFiles: [LocalizationStringsFile]) {
-    print("------------ Checking for missing keys -----------")
-    guard let base = localizationFiles.first else { return }
-    let baseKeys = Set(base.rows)
-    codeFiles.forEach { file in
-        let set = Set(file.rows)
-        let extraKeysRows = set.subtracting(baseKeys)
-
-        extraKeysRows.forEach({ row in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number + 1): error: 🔑 \"\(row.key)\" located in -> 📁 \(file.path), missing in strings file.")
-        })
-
-        guard !extraKeysRows.isEmpty else { return }
-        scriptFinishedWithoutErrors = false
-    }
-}
-
-/// Throws warning if keys exist in localizable file but are not being used
-///
-/// - Parameters
-///   - codeFiles: Array of LocalizationCodeFile
-///   - localizationFiles: Array of LocalizableStringFiles
-func validateDeadKeys(from codeFiles: [File], in localizationFiles: [LocalizationStringsFile]) {
-    print("------------ Checking for any dead keys in localizable file -----------")
-    guard let baseFile = localizationFiles.first else { fatalError("Could not locate base localization file") }
-    let allRowsWithKeysInProject = codeFiles.compactMap { $0.rows }.reduce([], +)
-    guard let allCodeFileKeys = NSOrderedSet(array: allRowsWithKeysInProject).array as? [Row] else { fatalError("Could not locate flat all rows") }
-
-    let baseKeys = Set(baseFile.rows)
-    let deadKeys = baseKeys.subtracting(allCodeFileKeys)
-    deadKeys.forEach({ row in
-        localizationFiles.forEach({ file in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number + 1): warning: Dead 🔑 \"\(row.key)\", not being used.")
-        })
-    })
-}
-
-validateLocalizationKeysMatch(in: localizableFiles)
 writeSorted(localizableFiles)
+validateLocalizationKeysMatch(in: localizableFiles)
+validateDuplicateKeys(in: localizableFiles)
 
 let filesWithLocalizationKeys = getFilesWithLocalizationKeys(in: projectFiles)
 validateMissingKeys(from: filesWithLocalizationKeys, in: localizableFiles)
 validateDeadKeys(from: filesWithLocalizationKeys, in: localizableFiles)
 
-print("------------ SUCCESS ------------")
+print("Finished with \(scriptFinishedWithoutErrors ? "✅ SUCCESS" : "❌ ERRORS FOUND")")
 scriptFinishedWithoutErrors ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
 
 

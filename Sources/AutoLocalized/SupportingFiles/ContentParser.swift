@@ -13,7 +13,7 @@ struct ContentParser {
     /// - Parameter path: Localizable file paths
     /// - Returns: localizable key and value for content at path
     static func parse(_ path: String) -> [Row] {
-        let rowsInFile: [String] = contents(atPath: path)
+        let rowsInFile: [String] = allStringRows(atPath: path)
         var foundErrorInRegex = false
 
         var rows: [Row] = rowsInFile.enumerated().compactMap({ index, rowString in
@@ -25,10 +25,10 @@ struct ContentParser {
 
             if keys.count > 1 || values.count > 1 {
                 foundErrorInRegex = true
-                print("\(fileManager.currentDirectoryPath)/\(path):\(index): error: Error parsing contents: Line should contain only 1 key and 1 value")
+                print("\(fileManager.currentDirectoryPath)/\(path):\(index + 1): error: Error parsing contents: Line should contain only 1 key and 1 value")
             } else if keys.isEmpty || values.isEmpty {
                 foundErrorInRegex = true
-                print("\(fileManager.currentDirectoryPath)/\(path):\(index): error: Error parsing contents: No \(keys.isEmpty ? "key" : "value") found")
+                print("\(fileManager.currentDirectoryPath)/\(path):\(index + 1): error: Error parsing contents: No \(keys.isEmpty ? "key" : "value") found")
             }
 
             if let key = keys.first, let value = values.first {
@@ -38,22 +38,13 @@ struct ContentParser {
         })
 
         guard !foundErrorInRegex else { exit(EXIT_FAILURE) }
-        print("------------ 🧮 Sort: \(path) ------------")
         rows.sort(by: { $0.key < $1.key })
         rows.enumerated().forEach({ index, row in
-            row.number = index
+            row.number = index + 1
             row.key = row.key.replacingOccurrences(of: "\"", with: "")
             row.value.removeFirst()
             row.value.removeLast()
         })
         return rows
-//print("------------ Validating duplicate keys: \(path) ------------")
-//        return zip(keys, values).reduce(into: [String: String]()) { results, keyValue in
-//            if results[keyValue.0] != nil {
-//                printPretty("error: Found duplicate key: \(keyValue.0) in file: \(path)")
-//                exit(EXIT_FAILURE)
-//            }
-//            results[keyValue.0] = keyValue.1
-//        }
     }
 }
