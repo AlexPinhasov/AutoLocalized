@@ -20,101 +20,44 @@ var pathFiles: [String] = {
 }()
 
 /// List of localizable files - not including Localizable files in the Pods
-var localizableFiles: [String] = {
-    return pathFiles.filter { $0.hasSuffix("Localize.strings") && !$0.contains("Pods") }
+var localizableFiles: [LocalizationStringsFile] = {
+    let files = pathFiles.filter { $0.hasSuffix("Localize.strings") && !$0.contains("Pods") }.map(LocalizationStringsFile.init(path:))
+    guard files.count > 1 else {
+        print("------------ 📚 Only 1 localize file found ------------")
+        exit(EXIT_SUCCESS)
+    }
+    return files
 }()
 
 /// List of executable files
-var executableFiles: [String] = {
-    return pathFiles.filter { (!$0.localizedCaseInsensitiveContains("test") && NSString(string: $0).pathExtension == "swift"  && !NSString(string: $0).contains("Pods")) && NSString(string: $0).contains("Selina/Localization/Enums") || NSString(string: $0).pathExtension == "xib" || NSString(string: $0).pathExtension == "storyboard"}
+var projectFiles: [File] = {
+    return pathFiles.filter { (!$0.localizedCaseInsensitiveContains("test") && NSString(string: $0).pathExtension == "swift"  && !NSString(string: $0).contains("Pods")) && NSString(string: $0).contains("Selina/Localization/Enums") || NSString(string: $0).pathExtension == "xib" || NSString(string: $0).pathExtension == "storyboard"}.compactMap({ File(path: $0, rows: []) })
 }()
-
-/// Reads contents in path
-///
-/// - Parameter path: path of file
-/// - Returns: content in file
-func contents(atPath path: String) -> String {
-    guard let data = fileManager.contents(atPath: path),
-        let content = String(data: data, encoding: .utf8)
-        else { fatalError("Could not read from path: \(path)") }
-    return content
-}
-
-/// Returns a list of strings that match regex pattern from content
-///
-/// - Parameters:
-///   - pattern: regex pattern
-///   - content: content to match
-/// - Returns: list of results
-func regexFor(_ pattern: String, content: String, rangeIndex: Int = 0) -> [String] {
-    guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { fatalError("Regex not formatted correctly: \(pattern)")}
-    let matches = regex.matches(in: content, options: [], range: NSRange(location: 0, length: content.utf16.count))
-    return matches.map {
-        guard let range = Range($0.range(at: rangeIndex), in: content) else { fatalError("Incorrect range match") }
-        return String(content[range])
-    }
-}
-
-func create() -> [LocalizationStringsFile] {
-    return localizableFiles.map(LocalizationStringsFile.init(path:))
-}
-
-/// Writes back to localizable file with sorted keys and removed whitespaces and new lines
-func clean(_ stringFiles: [LocalizationStringsFile]) {
-    stringFiles.forEach({ localizeFile in
-        print("------------ 🧮 Sort and remove whitespaces: \(localizeFile.path) ------------")
-        let content = localizeFile.kv.keys.sorted().compactMap {
-            if let value = localizeFile.kv[$0] {
-                return "\($0) = \(value);"
-            }
-            printPretty("\(currentPath)/\(localizeFile.path):1: warning: ------------ ⚠️ Cant find value for key -> \($0)")
-            return nil
-        }.joined(separator: "\n")
-        do {
-            try content.write(toFile: localizeFile.path, atomically: true, encoding: .utf8)
-        } catch {
-            printPretty("\(currentPath)/\(localizeFile.path):1: error: ------------ ❌ Error: \(error) ------------")
-            exit(EXIT_FAILURE)
-        }
-    })
-}
-
-///
-///
-/// - Returns: A list of LocalizationCodeFile - contains path of file and all keys in it
-func localizedStringsInCode() -> [LocalizationCodeFile] {
-    return executableFiles.compactMap {
-        let content = contents(atPath: $0)
-        if $0.contains("xib") || $0.contains("storyboard") {
-            var matches = regexFor("(text|title|value|placeholder)=\"([a-z|_]*?)\"", content: content, rangeIndex: 2)
-            matches.removeAll(where: { $0 == "" || $0 == "\"\"" })
-            matches = matches.map({ $0.replacingOccurrences(of: "\"", with: "") })
-            return matches.isEmpty ? nil : LocalizationCodeFile(path: $0, keys: Set(matches))
-        } else {
-            var matches = regexFor("(case|return|static let).*?\"([a-z|_]*?)\"", content: content, rangeIndex: 2)
-            matches.removeAll(where: { $0 == "" || $0 == "\"\"" })
-            matches = matches.map({ $0.replacingOccurrences(of: "\"", with: "") })
-            return matches.isEmpty ? nil : LocalizationCodeFile(path: $0, keys: Set(matches))
-        }
-    }
-}
 
 /// Throws error is ALL localizable files does not have matching keys
 ///
 /// - Parameter files: list of localizable files to validate
-func validateMatchKeys(_ files: [LocalizationStringsFile]) {
+func validateLocalizationKeysMatch(in files: [LocalizationStringsFile]) {
     print("------------ 📚 Validating keys match in all localizable files ------------")
-    guard let base = files.first, files.count > 1 else {
-        print("------------ 📚 Only 1 localize file found ------------")
-        return
-    }
-    let files = Array(files.dropFirst())
-    files.forEach {
-        if let extraKey = base.keys.symmetricDifference($0.keys).first {
-            let incorrectFile = $0.keys.contains(extraKey) ? base : $0
-            printPretty("\(currentPath)/\(incorrectFile.path) error: Found missing key: \(extraKey) in file: \(incorrectFile.path)")
-            exit(EXIT_FAILURE)
-        }
+    guard let baseEnglishLocalization = files.first else { return }
+    let files = Array(files.suffix(from: 1))
+    let baseSet = Set(baseEnglishLocalization.rows)
+    files.forEach { file in
+        let fileSet = Set(file.rows)
+
+        let currentFileExtraKeysRows = fileSet.subtracting(baseSet)
+        let englishFileExtraKeysRows = baseSet.subtracting(fileSet)
+
+        currentFileExtraKeysRows.forEach({ row in
+            print("\(currentPath)/\(file.path):\(row.number): error: Found missing 🔑 \"\(row.key)\" in -> 📁 \(file.path)")
+        })
+
+        englishFileExtraKeysRows.forEach({ row in
+            print("\(currentPath)/\(baseEnglishLocalization.path):\(row.number): error: Found missing 🔑 \"\(row.key)\" in -> 📁 \(baseEnglishLocalization.path)")
+        })
+
+        guard !currentFileExtraKeysRows.isEmpty || !englishFileExtraKeysRows.isEmpty else { return }
+        exit(EXIT_FAILURE)
     }
 }
 
@@ -123,48 +66,47 @@ func validateMatchKeys(_ files: [LocalizationStringsFile]) {
 /// - Parameters:
 ///   - codeFiles: Array of LocalizationCodeFile
 ///   - localizationFiles: Array of LocalizableStringFiles
-func validateMissingKeys(_ codeFiles: [LocalizationCodeFile], localizationFiles: [LocalizationStringsFile]) {
+func validateMissingKeys(from codeFiles: [File], in localizationFiles: [LocalizationStringsFile]) {
     print("------------ Checking for missing keys -----------")
-    guard let baseFile = localizationFiles.first else { fatalError("Could not locate base localization file") }
-    let baseKeys = Set(baseFile.keys).map({ $0.replacingOccurrences(of: "\"", with: "")})
-    codeFiles.forEach {
-        let keysToCompare = $0.keys
-        let extraKeys = keysToCompare.subtracting(baseKeys)
-        if !extraKeys.isEmpty {
-            printPretty("error: Found keys in code: \(extraKeys) from \($0.path), missing in strings file ")
-            exit(EXIT_FAILURE)
-        }
+    guard let base = localizationFiles.first else { return }
+    let baseKeys = Set(base.rows)
+    codeFiles.forEach { file in
+        let set = Set(file.rows)
+        let extraKeysRows = set.subtracting(baseKeys)
+
+        extraKeysRows.forEach({ row in
+            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number): error: 🔑 \"\(row.key)\" located in -> 📁 \(file.path), missing in strings file.")
+        })
+
+        guard !extraKeysRows.isEmpty else { return }
+        exit(EXIT_FAILURE)
     }
 }
 
 /// Throws warning if keys exist in localizable file but are not being used
 ///
-/// - Parameters:
+/// - Parametersž
 ///   - codeFiles: Array of LocalizationCodeFile
 ///   - localizationFiles: Array of LocalizableStringFiles
-func validateDeadKeys(_ codeFiles: [LocalizationCodeFile], localizationFiles: [LocalizationStringsFile]) {
+func validateDeadKeys(from codeFiles: [File], in localizationFiles: [LocalizationStringsFile]) {
     print("------------ Checking for any dead keys in localizable file -----------")
     guard let baseFile = localizationFiles.first else { fatalError("Could not locate base localization file") }
-    let baseKeys = Set(baseFile.keys.map({ $0.replacingOccurrences(of: "\"", with: "")}))
-    var allCodeFileKeys = codeFiles.flatMap { $0.keys }
-    allCodeFileKeys = (NSOrderedSet(array: allCodeFileKeys)).array as! [String]
+    let allRowsWithKeysInProject = codeFiles.compactMap { $0.rows }.reduce([], +)
+    guard let allCodeFileKeys = NSOrderedSet(array: allRowsWithKeysInProject).array as? [Row] else { fatalError("Could not locate flat all rows") }
+
+    let baseKeys = Set(baseFile.rows)
     let deadKeys = baseKeys.subtracting(allCodeFileKeys)
-    if !deadKeys.isEmpty {
-        printPretty("warning: \(deadKeys) - Suggest cleaning dead keys")
-    }
+    deadKeys.forEach({ row in
+        print("\(fileManager.currentDirectoryPath)/\(baseFile.path):\(row.number): warning: Dead 🔑 \"\(row.key)\" located in -> 📁 \(baseFile.path), missing in strings file.")
+    })
 }
 
-func printPretty(_ string: String) {
-    print("\(string.replacingOccurrences(of: "\\", with: ""))")
-}
+validateLocalizationKeysMatch(in: localizableFiles)
+writeSorted(localizableFiles)
 
-let stringFiles = create()
-validateMatchKeys(stringFiles)
-clean(stringFiles)
-
-let codeFiles = localizedStringsInCode()
-validateMissingKeys(codeFiles, localizationFiles: stringFiles)
-validateDeadKeys(codeFiles, localizationFiles: stringFiles)
+let filesWithLocalizationKeys = getFilesWithLocalizationKeys(in: projectFiles)
+validateMissingKeys(from: filesWithLocalizationKeys, in: localizableFiles)
+validateDeadKeys(from: filesWithLocalizationKeys, in: localizableFiles)
 
 print("------------ SUCCESS ------------")
 exit(EXIT_SUCCESS)
