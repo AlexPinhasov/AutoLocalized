@@ -49,11 +49,11 @@ func validateLocalizationKeysMatch(in files: [LocalizationStringsFile]) {
         let englishFileExtraKeysRows = baseSet.subtracting(fileSet)
 
         currentFileExtraKeysRows.forEach({ row in
-            print("\(currentPath)/\(file.path):\(row.number): error: Found missing 🔑 \"\(row.key)\" in -> 📁 \(file.path)")
+            print("\(currentPath)/\(baseEnglishLocalization.path):\(row.number + 1): error: 🔑 \"\(row.key)\" appear in other localization files but is missing here.")
         })
 
         englishFileExtraKeysRows.forEach({ row in
-            print("\(currentPath)/\(baseEnglishLocalization.path):\(row.number): error: Found missing 🔑 \"\(row.key)\" in -> 📁 \(baseEnglishLocalization.path)")
+            print("\(currentPath)/\(file.path):\(row.number + 1): error: 🔑 \"\(row.key)\" appear in other localization files but is missing here.")
         })
 
         guard !currentFileExtraKeysRows.isEmpty || !englishFileExtraKeysRows.isEmpty else { return }
@@ -75,7 +75,7 @@ func validateMissingKeys(from codeFiles: [File], in localizationFiles: [Localiza
         let extraKeysRows = set.subtracting(baseKeys)
 
         extraKeysRows.forEach({ row in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number): error: 🔑 \"\(row.key)\" located in -> 📁 \(file.path), missing in strings file.")
+            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number + 1): error: 🔑 \"\(row.key)\" located in -> 📁 \(file.path), missing in strings file.")
         })
 
         guard !extraKeysRows.isEmpty else { return }
@@ -98,7 +98,7 @@ func validateDeadKeys(from codeFiles: [File], in localizationFiles: [Localizatio
     let deadKeys = baseKeys.subtracting(allCodeFileKeys)
     deadKeys.forEach({ row in
         localizationFiles.forEach({ file in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number + 1): warning: Dead 🔑 \"\(row.key)\",not being used.")
+            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number + 1): warning: Dead 🔑 \"\(row.key)\", not being used.")
         })
     })
 }
