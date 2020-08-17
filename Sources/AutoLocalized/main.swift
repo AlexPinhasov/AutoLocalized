@@ -7,6 +7,8 @@ import Darwin
 let arguments: [String] = Array(CommandLine.arguments.dropFirst())
 
 guard let currentPath: String = arguments.first else { exit(EXIT_FAILURE) }
+var scriptFinishedWithoutErrors = true
+
 
 let fileManager = FileManager.default
 FileManager.default.changeCurrentDirectoryPath(currentPath)
@@ -57,7 +59,7 @@ func validateLocalizationKeysMatch(in files: [LocalizationStringsFile]) {
         })
 
         guard !currentFileExtraKeysRows.isEmpty || !englishFileExtraKeysRows.isEmpty else { return }
-        exit(EXIT_FAILURE)
+        scriptFinishedWithoutErrors = false
     }
 }
 
@@ -79,7 +81,7 @@ func validateMissingKeys(from codeFiles: [File], in localizationFiles: [Localiza
         })
 
         guard !extraKeysRows.isEmpty else { return }
-        exit(EXIT_FAILURE)
+        scriptFinishedWithoutErrors = false
     }
 }
 
@@ -111,5 +113,6 @@ validateMissingKeys(from: filesWithLocalizationKeys, in: localizableFiles)
 validateDeadKeys(from: filesWithLocalizationKeys, in: localizableFiles)
 
 print("------------ SUCCESS ------------")
-exit(EXIT_SUCCESS)
+scriptFinishedWithoutErrors ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
+
 
