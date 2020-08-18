@@ -75,7 +75,7 @@ func getFilesWithLocalizationKeys(in executableFiles: [File]) -> [File] {
             matches = matches.map({ $0.replacingOccurrences(of: "\"", with: "") })
 
             if let match = matches.first {
-                return Row(number: index, key: match, value: "")
+                return Row(number: index + 1, key: match, value: "")
             }
             return nil
         })
