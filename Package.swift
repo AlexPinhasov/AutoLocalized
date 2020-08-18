@@ -8,6 +8,9 @@ let package = Package(
     products: [
         .executable(name: "autolocalized", targets: ["AutoLocalized"])
     ],
+    platforms: [
+        .macOS(.v10_15), .iOS(.v12)
+    ],
     targets: [
         .target(name: "AutoLocalized", dependencies: []),
         .testTarget(name: "AutoLocalizedTests", dependencies: ["AutoLocalized"]),
