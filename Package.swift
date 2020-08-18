@@ -5,11 +5,11 @@ import PackageDescription
 
 let package = Package(
     name: "AutoLocalized",
-    products: [
-        .executable(name: "autolocalized", targets: ["AutoLocalized"])
-    ],
     platforms: [
         .macOS(.v10_15), .iOS(.v12)
+    ],
+    products: [
+        .executable(name: "autolocalized", targets: ["AutoLocalized"])
     ],
     targets: [
         .target(name: "AutoLocalized", dependencies: []),
