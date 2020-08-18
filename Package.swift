@@ -6,16 +6,11 @@ import PackageDescription
 let package = Package(
     name: "AutoLocalized",
     products: [
-        .library(
-            name: "AutoLocalized",
-            targets: ["AutoLocalized"]),
+        .executable(name: "autolocalized", targets: ["AutoLocalized"]),
+        .library(name: "AutoLocalized", targets: ["AutoLocalized"]),
     ],
     targets: [
-        .target(
-            name: "AutoLocalized",
-            dependencies: []),
-        .testTarget(
-            name: "AutoLocalizedTests",
-            dependencies: ["AutoLocalized"]),
+        .target(name: "AutoLocalized", dependencies: []),
+        .testTarget(name: "AutoLocalizedTests", dependencies: ["AutoLocalized"]),
     ]
 )
