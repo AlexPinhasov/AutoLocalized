@@ -5,9 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "AutoLocalized",
-    platforms: [
-        .iOS(SupportedPlatform.IOSVersion.v13)
-    ],
     products: [
         .executable(name: "AutoLocalized", targets: ["AutoLocalized"]),
         .library(name: "AutoLocalized", targets: ["AutoLocalized"])
