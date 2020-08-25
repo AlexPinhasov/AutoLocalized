@@ -12,6 +12,10 @@ class Row: Hashable {
     var key: String
     var value: String
 
+    var keyValue: String {
+        "\"\(key)\" = \"\(value)\";"
+    }
+
     init(number: Int, key: String, value: String) {
         self.number = number
         self.key = key
