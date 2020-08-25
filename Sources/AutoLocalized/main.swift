@@ -46,6 +46,7 @@ var projectFiles: [File] = {
         return regexFor("autolocalized:disable", content: content(atPath: path), rangeIndex: 0).count != 1
     }
 
+    print(Configurations.excludedDirectories)
     return pathFiles.compactMap({
         guard shouldUseFile(atPath: $0) && shouldIgnoreFile(atPath: $0) else { return nil }
         return File(path: $0, rows: [])
