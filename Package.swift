@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "AutoLocalized",
+    products: [
+        .executable(name: "AutoLocalized", targets: ["AutoLocalized"])
+    ],
     targets: [
         .target(name: "AutoLocalized", dependencies: []),
         .testTarget(name: "AutoLocalizedTests", dependencies: ["AutoLocalized"]),
