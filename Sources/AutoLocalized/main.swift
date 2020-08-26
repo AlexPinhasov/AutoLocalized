@@ -37,17 +37,12 @@ var localizableFiles: [LocalizeFile] = {
 
 /// List of executable files
 var projectFiles: [File] = {
-    func shouldUseFile(atPath path: String) -> Bool {
-        return Configurations.supportedFileExtensions.contains(NSString(string: path).pathExtension) &&
-            Configurations.excludedDirectories.compactMap({ path.contains($0) }).contains(false)
-    }
-
-    func shouldIgnoreFile(atPath path: String) -> Bool {
-        return regexFor("autolocalized:disable", content: content(atPath: path), rangeIndex: 0).count != 1
-    }
-
     return pathFiles.compactMap({
-        guard shouldUseFile(atPath: $0) && shouldIgnoreFile(atPath: $0) else { return nil }
+        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) {
+            return nil
+        }
+
+        guard Configurations.supportedFileExtensions.contains(NSString(string: $0).pathExtension) else { return nil }
         return File(path: $0, rows: [])
     })
 }()

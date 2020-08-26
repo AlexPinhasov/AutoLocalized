@@ -29,7 +29,16 @@ func regexFor(_ pattern: String, content: String, rangeIndex: Int = 0) -> [Strin
 /// - Returns: A list of Files - contains path of file and all keys in it
 func getFilesWithLocalizationKeys(in executableFiles: [File]) -> [File] {
     executableFiles.forEach { file in
+        var shouldSkipLine = false
         file.rows = file.allStringRows.enumerated().compactMap({ index, stringRow in
+            if shouldSkipLine {
+                shouldSkipLine = !stringRow.contains("autolocalized:enable")
+                return nil
+            }
+            if stringRow.contains("autolocalized:disable") {
+                shouldSkipLine = true
+                return nil
+            }
             var regexString = ""
 
             if file.path.contains("xib") || file.path.contains("storyboard") {
