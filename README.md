@@ -23,7 +23,7 @@
 
 ## Installation
 
-EqualableGeneric is available through SPM (Swift Package Manager). To install
+AutoLocalized is available through SPM (Swift Package Manager). To install
 it, simply add the repository, File -> Swift Packages -> Add Package Dependency
 
 ## Author
@@ -32,5 +32,5 @@ AlexPinhasov, alex5872205@gmail.com
 
 ## License
 
-EqualableGeneric is available under the MIT license. See the LICENSE file for more info.
+AutoLocalized is available under the MIT license. See the LICENSE file for more info.
 
