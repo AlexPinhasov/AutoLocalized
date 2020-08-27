@@ -6,32 +6,30 @@ import Foundation
 let arguments: [String] = Array(CommandLine.arguments.dropFirst())
 
 let projectPath: String = arguments[0]
-let projectName: String = arguments[1]
-let configurationPath: String = arguments[2]
-guard !projectPath.isEmpty, !projectName.isEmpty, !configurationPath.isEmpty else { fatalError("Missing arguments in build phase")}
-guard let configurationPathComponent = NSString(string: configurationPath).pathComponents.last else { exit(EXIT_FAILURE) }
+let configurationPath: String = "/AutoLocalizedConfiguration.swift"
+guard !projectPath.isEmpty else { fatalError("Missing arguments in build phase")}
 
 var scriptFinishedWithoutErrors = true
-
 let fileManager = FileManager.default
 let packagePath = fileManager.currentDirectoryPath
-setConfigurationFile(with: configurationPathComponent, projectPath: projectPath)
+setConfigurationFile(with: configurationPath, projectPath: projectPath)
 
 /// List of files in currentPath - recursive
 var pathFiles: [String] = {
     guard let enumerator = fileManager.enumerator(atPath: projectPath),
         let files = enumerator.allObjects as? [String]
         else { fatalError("Could not locate files in path directory: \(projectPath)") }
+    print("Total files in project \(files.count)")
     return files
 }()
 
 // MARK: - Localization Files
 
-/// List of localizable files - not including Localizable files in the Pods
+/// List of localizable files
 var localizableFiles: [LocalizeFile] = {
     print("Localization files:")
     return pathFiles.compactMap {
-        guard !$0.contains("Pods") && NSString(string: $0).pathExtension == "strings" else { return nil }
+        guard NSString(string: $0).pathExtension == "strings" else { return nil }
         print("🧽 \($0)")
         return LocalizeFile(path: $0)
     }
@@ -42,7 +40,7 @@ var localizableFiles: [LocalizeFile] = {
 /// List of project files
 var projectFiles: [ProjectFile] = {
     let files: [ProjectFile] = pathFiles.compactMap({
-        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) && NSString(string: $0).pathComponents.first == projectName { return nil }
+        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) { return nil }
         guard Configurations.supportedFileExtensions.contains(NSString(string: $0).pathExtension) else { return nil }
         let projectFile = ProjectFile(path: $0)
         if projectFile.rows.isEmpty { return nil }

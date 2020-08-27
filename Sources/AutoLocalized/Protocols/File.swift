@@ -19,6 +19,7 @@ extension File {
     /// - Parameter path: path of file
     /// - Returns: all rows in file
     var allStringRows: [String] {
+        print(path)
         guard let data = fileManager.contents(atPath: path),
             let content = String(data: data, encoding: .utf8)?.components(separatedBy: .newlines)
             else { fatalError("Could not read from path: \(path)") }

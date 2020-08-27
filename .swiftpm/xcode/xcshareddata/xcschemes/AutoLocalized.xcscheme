@@ -14,23 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "autolocalized"
-               BuildableName = "autolocalized"
-               BlueprintName = "autolocalized"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AutoLocalizedTests"
-               BuildableName = "AutoLocalizedTests"
-               BlueprintName = "AutoLocalizedTests"
+               BlueprintIdentifier = "AutoLocalized"
+               BuildableName = "AutoLocalized"
+               BlueprintName = "AutoLocalized"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,16 +28,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AutoLocalizedTests"
-               BuildableName = "AutoLocalizedTests"
-               BlueprintName = "AutoLocalizedTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -68,9 +44,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "autolocalized"
-            BuildableName = "autolocalized"
-            BlueprintName = "autolocalized"
+            BlueprintIdentifier = "AutoLocalized"
+            BuildableName = "AutoLocalized"
+            BlueprintName = "AutoLocalized"
             ReferencedContainer = "container:">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -85,9 +61,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "autolocalized"
-            BuildableName = "autolocalized"
-            BlueprintName = "autolocalized"
+            BlueprintIdentifier = "AutoLocalized"
+            BuildableName = "AutoLocalized"
+            BlueprintName = "AutoLocalized"
             ReferencedContainer = "container:">
          </BuildableReference>
       </BuildableProductRunnable>

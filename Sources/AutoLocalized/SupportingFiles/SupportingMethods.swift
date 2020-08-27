@@ -1,6 +1,6 @@
 //
 //  SupportingMethods.swift
-//  
+//
 //
 //  Created by Alex Pinhasov on 17/08/2020.
 //
@@ -27,9 +27,9 @@ func regexFor(_ pattern: String, content: String, rangeIndex: Int = 0) -> [Strin
 /// - Parameters:
 ///   - configurationPathComponent: path for configuration file
 ///   - projectPath: path for your project
-func setConfigurationFile(with configurationPathComponent: String, projectPath: String) {
+func setConfigurationFile(with configurationPath: String, projectPath: String) {
     FileManager.default.changeCurrentDirectoryPath(projectPath)
-    guard let data = fileManager.contents(atPath: configurationPathComponent), let configurationContent = String(data: data, encoding: .utf8) else { fatalError("Could not read from path: \(projectPath)") }
+    guard let data = fileManager.contents(atPath: projectPath  + configurationPath), let configurationContent = String(data: data, encoding: .utf8) else { fatalError("Could not read from path: \(projectPath)") }
 
     FileManager.default.changeCurrentDirectoryPath(packagePath)
     do {
