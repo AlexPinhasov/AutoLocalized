@@ -1,13 +1,11 @@
 //
-//  File 2.swift
+//  SupportingMethods.swift
 //  
 //
 //  Created by Alex Pinhasov on 17/08/2020.
 //
 
 import Foundation
-
-
 
 /// Returns a list of strings that match regex pattern from content
 ///
@@ -24,52 +22,20 @@ func regexFor(_ pattern: String, content: String, rangeIndex: Int = 0) -> [Strin
     }
 }
 
+/// Copy the content of the configuration file located in your project
 ///
-///
-/// - Returns: A list of Files - contains path of file and all keys in it
-func getFilesWithLocalizationKeys(in executableFiles: [File]) -> [File] {
-    executableFiles.forEach { file in
-        var shouldSkipLine = false
-        file.rows = file.allStringRows.enumerated().compactMap({ index, stringRow in
-            if shouldSkipLine {
-                shouldSkipLine = !stringRow.contains("autolocalized:enable")
-                return nil
-            }
-            if stringRow.contains("autolocalized:disable") {
-                shouldSkipLine = true
-                return nil
-            }
-            var regexString = ""
-
-            if file.path.contains("xib") || file.path.contains("storyboard") {
-                regexString = "(text|title|value|placeholder)=\"([a-z|_]*?)\""
-            } else {
-                regexString = "(case|return|static let).*?\"([a-z|_]*?)\""
-            }
-
-            var matches = regexFor(regexString, content: stringRow, rangeIndex: 2)
-            matches.removeAll(where: { $0 == "" || $0 == "\"\"" })
-            matches = matches.map({ $0.replacingOccurrences(of: "\"", with: "") })
-
-            if let match = matches.first {
-                return Row(number: index + 1, key: match, value: "")
-            }
-            return nil
-        })
-    }
-    return executableFiles
-}
-
+/// - Parameters:
+///   - configurationPathComponent: path for configuration file
+///   - projectPath: path for your project
 func setConfigurationFile(with configurationPathComponent: String, projectPath: String) {
     FileManager.default.changeCurrentDirectoryPath(projectPath)
-    let configurationContent = content(atPath: configurationPathComponent)
-    FileManager.default.changeCurrentDirectoryPath(packagePath)
+    guard let data = fileManager.contents(atPath: configurationPathComponent), let configurationContent = String(data: data, encoding: .utf8) else { fatalError("Could not read from path: \(projectPath)") }
 
+    FileManager.default.changeCurrentDirectoryPath(packagePath)
     do {
         try configurationContent.write(toFile: "Sources/AutoLocalized/SupportingFiles/Configuration.swift", atomically: true, encoding: .utf8)
     } catch {
         exit(EXIT_FAILURE)
     }
-
     FileManager.default.changeCurrentDirectoryPath(projectPath)
 }

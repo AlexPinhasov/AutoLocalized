@@ -1,5 +1,5 @@
 //
-//  File 2.swift
+//  LocalizeFile.swift
 //  
 //
 //  Created by Alex Pinhasov on 23/08/2020.
@@ -8,19 +8,24 @@
 import Foundation
 
 class LocalizeFile: File {
-    convenience init(path: String) {
-        self.init(path: path, rows: [])
-        parseRows()
+    var path: String
+    var rows: [Row] = []
+
+    init(path: String) {
+        self.path = path
+        self.rows = parseRows()
+        rows.sort(by: { $0.key < $1.key })
+        rows.enumerated().forEach({ $1.number = $0 + 1 })
     }
 
     /// Parses contents of a file to localizable keys and values - Throws error if localizable file have duplicated keys
     ///
     /// - Parameter path: Localizable file paths
     /// - Returns: localizable key and value for content at path
-    private func parseRows() {
+    func parseRows() -> [Row] {
         var foundErrorInRegex = false
 
-        rows = allStringRows.enumerated().compactMap({ index, rowString in
+        let rows: [Row] = allStringRows.enumerated().compactMap({ index, rowString in
             guard !rowString.isEmpty else { return nil }
 
             let keys = regexFor("\"([^\"]*?)\"(?= =)", content: rowString, rangeIndex: 1)
@@ -35,18 +40,18 @@ class LocalizeFile: File {
             }
 
             guard let key = keys.first, let value = values.first else { return nil }
-            return Row(number: 0, key: key, value: value)
+            return Row(in: self, number: 0, key: key, value: value)
         })
 
         guard !foundErrorInRegex else { exit(EXIT_FAILURE) }
-        rows.sort(by: { $0.key < $1.key })
-        rows.enumerated().forEach({ $1.number = $0 + 1 })
+        return rows
     }
 
     /// Writes back to localizable file
     func writeSorted() {
         do {
             let content = rows.compactMap { $0.keyValue }.joined(separator: "\n")
+            guard !content.isEmpty else { fatalError("Cant get \(path) content") }
             try content.write(toFile: path, atomically: true, encoding: .utf8)
         } catch {
             print("\(fileManager.currentDirectoryPath)/\(path):1: error: ------------ ❌ Error: \(error) ------------")

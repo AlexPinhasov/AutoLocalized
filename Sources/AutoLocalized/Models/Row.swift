@@ -9,14 +9,16 @@ import Foundation
 
 class Row: Hashable {
     var number: Int
-    var key: String
-    var value: String
+    private(set) var key: String
+    private(set) var value: String
+    private(set) var file: File?
 
     var keyValue: String {
         "\"\(key)\" = \"\(value)\";"
     }
 
-    init(number: Int, key: String, value: String) {
+    init(in file: File, number: Int, key: String, value: String) {
+        self.file = file
         self.number = number
         self.key = key
         self.value = value

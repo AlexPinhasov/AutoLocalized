@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ValidationMethods.swift
 //  
 //
 //  Created by Alex Pinhasov on 17/08/2020.
@@ -11,24 +11,23 @@ import Foundation
 ///
 /// - Parameter files: list of localizable files to validate
 func validateLocalizationKeysMatch(in localizationFiles: [File]) {
-    guard localizationFiles.count > 1, let baseEnglishLocalization = localizationFiles.first else { return }
+    guard localizationFiles.count > 1, let baseLocalizationFile = localizationFiles.first else { return }
     let files = Array(localizationFiles.suffix(from: 1))
-    let baseSet = Set(baseEnglishLocalization.rows)
+    let baseSet = Set(baseLocalizationFile.rows)
     files.forEach { file in
         let fileSet = Set(file.rows)
         let currentFileExtraKeysRows = fileSet.subtracting(baseSet)
         let englishFileExtraKeysRows = baseSet.subtracting(fileSet)
 
         currentFileExtraKeysRows.forEach({ row in
-            print("\(fileManager.currentDirectoryPath)/\(baseEnglishLocalization.path):\(row.number): error: 🔑 \"\(row.key)\" appear in other localization files but is missing here.")
+            print(type: .error, violation: .localizeFilesDontMatch, for: row)
+            scriptFinishedWithoutErrors = false
         })
 
         englishFileExtraKeysRows.forEach({ row in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number): error: 🔑 \"\(row.key)\" appear in other localization files but is missing here.")
+            print(type: .error, violation: .localizeFilesDontMatch, for: row)
+            scriptFinishedWithoutErrors = false
         })
-
-        guard !currentFileExtraKeysRows.isEmpty || !englishFileExtraKeysRows.isEmpty else { return }
-        scriptFinishedWithoutErrors = false
     }
 }
 
@@ -41,15 +40,12 @@ func validateMissingKeys(from files: [File], in localizationFiles: [File]) {
     guard let base = localizationFiles.first else { return }
     let baseKeys = Set(base.rows)
     files.forEach { file in
-        let set = Set(file.rows)
-        let extraKeysRows = set.subtracting(baseKeys)
-
+        let fileKeysSet = Set(file.rows)
+        let extraKeysRows = fileKeysSet.subtracting(baseKeys)
         extraKeysRows.forEach({ row in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number): error: 🔑 \"\(row.key)\" missing in strings file.")
+            print(type: .error, violation: .missingKey, for: row)
+            scriptFinishedWithoutErrors = false
         })
-
-        guard !extraKeysRows.isEmpty else { return }
-        scriptFinishedWithoutErrors = false
     }
 }
 
@@ -65,10 +61,8 @@ func validateDeadKeys(from files: [File], in localizationFiles: [File]) {
 
     let baseKeys = Set(baseFile.rows)
     let deadKeys = baseKeys.subtracting(allCodeFileKeys)
-    deadKeys.forEach({ row in
-        localizationFiles.forEach({ file in
-            print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number): warning: Dead 🔑 \"\(row.key)\", not being used.")
-        })
+    deadKeys.forEach({
+        print(type: .warning, violation: .deadKey, for: $0)
     })
 }
 
@@ -81,10 +75,11 @@ func validateDuplicateKeys(in localizationFiles: [File]) {
         var duplicateKeys: [String: Row] = [:]
         file.rows.forEach({ row in
             if duplicateKeys[row.key] != nil, let duplicateRow = duplicateKeys[row.key] {
-                print("\(fileManager.currentDirectoryPath)/\(file.path):\(row.number): error: 🔑 \"\(row.key)\" has duplicate in line \(row.number).")
-                print("\(fileManager.currentDirectoryPath)/\(file.path):\(duplicateRow.number): error: 🔑 \"\(duplicateRow.key)\" has duplicate in line \(row.number).")
+                print(type: .error, violation: .duplicateKey, for: row)
+                print(type: .error, violation: .duplicateKey, for: duplicateRow)
             }
             duplicateKeys[row.key] = row
         })
     }
 }
+

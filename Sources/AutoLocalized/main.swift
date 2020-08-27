@@ -5,9 +5,11 @@ import Foundation
 // We drop the first argument, which is the script execution path.
 let arguments: [String] = Array(CommandLine.arguments.dropFirst())
 
-guard let projectPath: String = arguments.first,
-    let configurationPath: String = arguments.last,
-    let configurationPathComponent = NSString(string: configurationPath).pathComponents.last else { exit(EXIT_FAILURE) }
+let projectPath: String = arguments[0]
+let projectName: String = arguments[1]
+let configurationPath: String = arguments[2]
+guard !projectPath.isEmpty, !projectName.isEmpty, !configurationPath.isEmpty else { fatalError("Missing arguments in build phase")}
+guard let configurationPathComponent = NSString(string: configurationPath).pathComponents.last else { exit(EXIT_FAILURE) }
 
 var scriptFinishedWithoutErrors = true
 
@@ -27,42 +29,60 @@ var pathFiles: [String] = {
 
 /// List of localizable files - not including Localizable files in the Pods
 var localizableFiles: [LocalizeFile] = {
+    print("Localization files:")
     return pathFiles.compactMap {
         guard !$0.contains("Pods") && NSString(string: $0).pathExtension == "strings" else { return nil }
+        print("🧽 \($0)")
         return LocalizeFile(path: $0)
     }
 }()
 
 // MARK: - Other Files
 
-/// List of executable files
-var projectFiles: [File] = {
-    return pathFiles.compactMap({
-        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) {
-            return nil
-        }
-
+/// List of project files
+var projectFiles: [ProjectFile] = {
+    let files: [ProjectFile] = pathFiles.compactMap({
+        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) && NSString(string: $0).pathComponents.first == projectName { return nil }
         guard Configurations.supportedFileExtensions.contains(NSString(string: $0).pathExtension) else { return nil }
-        return File(path: $0, rows: [])
+        let projectFile = ProjectFile(path: $0)
+        if projectFile.rows.isEmpty { return nil }
+        return projectFile
     })
+
+
+    let sortedByExtension = files.sorted(by: { NSString(string: $0.path).pathExtension < NSString(string: $1.path).pathExtension })
+    var currentExtension = ""
+    sortedByExtension.forEach({
+        let fileExtension = NSString(string: $0.path).pathExtension
+        if fileExtension != currentExtension {
+            currentExtension = fileExtension
+            print("\nAll \(currentExtension) files:\n")
+        }
+        print("🧽 \(NSString(string: $0.path).lastPathComponent) has \($0.rows.count) keys: 🔑 \($0.rows.compactMap({ $0.key }))")
+    })
+
+    return files
 }()
 
-func content(atPath path: String, fileManager: FileManager = FileManager.default) -> String {
-    guard let data = fileManager.contents(atPath: path), let content = String(data: data, encoding: .utf8)
-        else { fatalError("Could not read from path: \(path)") }
-    return content
-}
-
-// MARK: - Execution
+// MARK: - Sort Localization files key
 
 localizableFiles.forEach({ $0.writeSorted() })
-validateLocalizationKeysMatch(in: localizableFiles)
-validateDuplicateKeys(in: localizableFiles)
 
-let filesWithLocalizationKeys = getFilesWithLocalizationKeys(in: projectFiles)
-validateMissingKeys(from: filesWithLocalizationKeys, in: localizableFiles)
-validateDeadKeys(from: filesWithLocalizationKeys, in: localizableFiles)
+let group = DispatchGroup()
+group.enter()
 
+// MARK: - Validation
+DispatchQueue.global(qos: .background).async {
+    validateLocalizationKeysMatch(in: localizableFiles)
+    validateDuplicateKeys(in: localizableFiles)
+    validateMissingKeys(from: projectFiles, in: localizableFiles)
+    validateDeadKeys(from: projectFiles, in: localizableFiles)
+    group.leave()
+}
+
+// MARK: - Completion
+
+group.wait()
 print("Finished with \(scriptFinishedWithoutErrors ? "✅ SUCCESS" : "❌ ERRORS FOUND")")
 scriptFinishedWithoutErrors ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
 

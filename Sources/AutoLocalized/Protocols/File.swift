@@ -1,39 +1,38 @@
 //
-//  File 2.swift
+//  File.swift
 //  
 //
-//  Created by Alex Pinhasov on 17/08/2020.
+//  Created by Alex Pinhasov on 27/08/2020.
 //
 
 import Foundation
 
-class File {
-    var path: String
-    var rows: [Row]
+protocol File {
+    var path: String { get set }
+    var rows: [Row] { get set }
+    func parseRows() -> [Row]
+}
 
-    init(path: String, rows: [Row]) {
-        self.path = path
-        self.rows = rows
+extension File {
+    /// Reads rows in path
+    ///
+    /// - Parameter path: path of file
+    /// - Returns: all rows in file
+    var allStringRows: [String] {
+        guard let data = fileManager.contents(atPath: path),
+            let content = String(data: data, encoding: .utf8)?.components(separatedBy: .newlines)
+            else { fatalError("Could not read from path: \(path)") }
+        return content
     }
 
     /// Reads contents in path
     ///
     /// - Parameter path: path of file
     /// - Returns: content in file
-    lazy var allStringRows: [String] = {
+    var content: String {
         guard let data = fileManager.contents(atPath: path),
-            let content = String(data: data, encoding: .utf8)?.components(separatedBy: .newlines)
+            let content = String(data: data, encoding: .utf8)
             else { fatalError("Could not read from path: \(path)") }
         return content
-    }()
-
-    /// Reads contents in path
-    ///
-    /// - Parameter path: path of file
-    /// - Returns: content in file
-    lazy var content: String = {
-        guard let data = fileManager.contents(atPath: path), let content = String(data: data, encoding: .utf8)
-            else { fatalError("Could not read from path: \(path)") }
-        return content
-    }()
+    }
 }
