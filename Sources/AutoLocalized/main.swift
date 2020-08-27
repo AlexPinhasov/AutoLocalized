@@ -42,7 +42,7 @@ var localizableFiles: [LocalizeFile] = {
 /// List of project files
 var projectFiles: [ProjectFile] = {
     let files: [ProjectFile] = pathFiles.compactMap({
-        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) && NSString(string: $0).pathComponents.first == projectName { return nil }
+        for excludedPath in Configurations.excludedDirectories where $0.contains(excludedPath) || NSString(string: $0).pathComponents.first != projectName { return nil }
         guard Configurations.supportedFileExtensions.contains(NSString(string: $0).pathExtension) else { return nil }
         let projectFile = ProjectFile(path: $0)
         if projectFile.rows.isEmpty { return nil }
