@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol File {
+public protocol File {
     var path: String { get set }
     var rows: [Row] { get set }
     func parseRows() -> [Row]
@@ -19,7 +19,7 @@ extension File {
     /// - Parameter path: path of file
     /// - Returns: all rows in file
     var allStringRows: [String] {
-        guard let data = fileManager.contents(atPath: path),
+        guard let data = FileManager.default.contents(atPath: path),
             let content = String(data: data, encoding: .utf8)?.components(separatedBy: .newlines)
             else { fatalError("Could not read from path: \(path)") }
         return content
@@ -30,7 +30,7 @@ extension File {
     /// - Parameter path: path of file
     /// - Returns: content in file
     var content: String {
-        guard let data = fileManager.contents(atPath: path),
+        guard let data = FileManager.default.contents(atPath: path),
             let content = String(data: data, encoding: .utf8)
             else { fatalError("Could not read from path: \(path)") }
         return content

@@ -1,6 +1,5 @@
-#!/usr/bin/xcrun swift
-
 import Foundation
+import AutoLocalizedCore
 
 // We drop the first argument, which is the script execution path.
 let arguments: [String] = Array(CommandLine.arguments.dropFirst())
@@ -10,13 +9,13 @@ let configurationPath: String = "/AutoLocalizedConfiguration.swift"
 guard !projectPath.isEmpty else { fatalError("Missing arguments in build phase")}
 
 var scriptFinishedWithoutErrors = true
-let fileManager = FileManager.default
-let packagePath = fileManager.currentDirectoryPath
-setConfigurationFile(with: configurationPath, projectPath: projectPath)
+public let fileManager = FileManager.default
+let packagePath = FileManager.default.currentDirectoryPath
+setConfigurationFile(with: configurationPath, projectPath: projectPath, packagePath: packagePath, fileManager: fileManager)
 
 /// List of files in currentPath - recursive
 var pathFiles: [String] = {
-    guard let enumerator = fileManager.enumerator(atPath: projectPath),
+    guard let enumerator = FileManager.default.enumerator(atPath: projectPath),
         let files = enumerator.allObjects as? [String]
         else { fatalError("Could not locate files in path directory: \(projectPath)") }
     print("Total files in project \(files.count)")
