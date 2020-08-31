@@ -7,11 +7,11 @@
 
 import Foundation
 
-enum PrintType: String {
+public enum PrintType: String {
     case error, warning
 }
 
-enum Violation {
+public enum Violation {
     case duplicateKey, deadKey, missingKey, localizeFilesDontMatch
 
     var string: String {
@@ -23,7 +23,7 @@ enum Violation {
         }
     }
 
-    func outputString(using row: Row) -> String {
+    public func outputString(using row: Row) -> String {
         switch self {
         case .duplicateKey: return self.string.withArguments([row.key, row.number.description])
         case .deadKey: return self.string.withArguments([row.key])
@@ -33,9 +33,9 @@ enum Violation {
     }
 }
 
-func print(type: PrintType, violation: Violation, for row: Row) {
+public func print(type: PrintType, violation: Violation, for row: Row) {
     guard let file = row.file else { return }
-    let filePathAndLine: String = "\(fileManager.currentDirectoryPath)/\(file.path):\(row.number)"
+    let filePathAndLine: String = "\(FileManager.default.currentDirectoryPath)/\(file.path):\(row.number)"
     print("\(filePathAndLine): \(type.rawValue): \(violation.outputString(using: row))")
 }
 

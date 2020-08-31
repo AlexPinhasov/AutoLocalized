@@ -7,11 +7,11 @@
 
 import Foundation
 
-class ProjectFile: File {
-    var path: String
-    var rows: [Row] = []
+public class ProjectFile: File {
+    public var path: String
+    public var rows: [Row] = []
 
-    init(path: String) {
+    public init(path: String) {
         self.path = path
         self.rows = parseRows()
     }
@@ -19,7 +19,7 @@ class ProjectFile: File {
     ///
     ///
     /// - Returns: A list of Files - contains path of file and all keys in it
-    func parseRows() -> [Row] {
+    public func parseRows() -> [Row] {
         var shouldSkipLine = false
         return allStringRows.enumerated().compactMap({ index, stringRow in
             if shouldSkipLine {

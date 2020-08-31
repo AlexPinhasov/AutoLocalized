@@ -7,11 +7,11 @@
 
 import Foundation
 
-class Row: Hashable {
+public class Row: Hashable {
     var number: Int
-    private(set) var key: String
-    private(set) var value: String
-    private(set) var file: File?
+    public private(set) var key: String
+    public private(set) var value: String
+    public private(set) var file: File?
 
     var keyValue: String {
         "\"\(key)\" = \"\(value)\";"
@@ -24,11 +24,11 @@ class Row: Hashable {
         self.value = value
     }
     
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(key)
     }
 
-    static func == (lhs: Row, rhs: Row) -> Bool {
+    static public func == (lhs: Row, rhs: Row) -> Bool {
         return lhs.key == rhs.key
     }
 }

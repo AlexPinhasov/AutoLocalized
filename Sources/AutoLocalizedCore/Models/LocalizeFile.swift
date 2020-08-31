@@ -7,11 +7,11 @@
 
 import Foundation
 
-class LocalizeFile: File {
-    var path: String
-    var rows: [Row] = []
+public class LocalizeFile: File {
+    public var path: String
+    public var rows: [Row] = []
 
-    init(path: String) {
+    public init(path: String) {
         self.path = path
         self.rows = parseRows()
         rows.sort(by: { $0.key < $1.key })
@@ -22,7 +22,7 @@ class LocalizeFile: File {
     ///
     /// - Parameter path: Localizable file paths
     /// - Returns: localizable key and value for content at path
-    func parseRows() -> [Row] {
+    public func parseRows() -> [Row] {
         var foundErrorInRegex = false
 
         let rows: [Row] = allStringRows.enumerated().compactMap({ index, rowString in
@@ -33,10 +33,10 @@ class LocalizeFile: File {
 
             if keys.count > 1 || values.count > 1 {
                 foundErrorInRegex = true
-                print("\(fileManager.currentDirectoryPath)/\(path):\(index + 1): error: Error parsing contents: Line should contain only 1 key and 1 value")
+                print("\(FileManager.default.currentDirectoryPath)/\(path):\(index + 1): error: Error parsing contents: Line should contain only 1 key and 1 value")
             } else if keys.isEmpty || values.isEmpty {
                 foundErrorInRegex = true
-                print("\(fileManager.currentDirectoryPath)/\(path):\(index + 1): error: Error parsing contents: No \(keys.isEmpty ? "key" : "value") found")
+                print("\(FileManager.default.currentDirectoryPath)/\(path):\(index + 1): error: Error parsing contents: No \(keys.isEmpty ? "key" : "value") found")
             }
 
             guard let key = keys.first, let value = values.first else { return nil }
@@ -48,13 +48,13 @@ class LocalizeFile: File {
     }
 
     /// Writes back to localizable file
-    func writeSorted() {
+    public func writeSorted() {
         do {
             let content = rows.compactMap { $0.keyValue }.joined(separator: "\n")
             guard !content.isEmpty else { fatalError("Cant get \(path) content") }
             try content.write(toFile: path, atomically: true, encoding: .utf8)
         } catch {
-            print("\(fileManager.currentDirectoryPath)/\(path):1: error: ------------ ❌ Error: \(error) ------------")
+            print("\(FileManager.default.currentDirectoryPath)/\(path):1: error: ------------ ❌ Error: \(error) ------------")
             exit(EXIT_FAILURE)
         }
     }

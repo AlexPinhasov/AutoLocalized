@@ -9,7 +9,8 @@ let package = Package(
         .executable(name: "AutoLocalized", targets: ["AutoLocalized"])
     ],
     targets: [
-        .target(name: "AutoLocalized", dependencies: []),
+        .target(name: "AutoLocalized", dependencies: ["AutoLocalizedCore"]),
+        .target(name: "AutoLocalizedCore"),
         .testTarget(name: "AutoLocalizedTests", dependencies: ["AutoLocalized"]),
     ]
 )
