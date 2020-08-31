@@ -33,7 +33,7 @@ public func setConfigurationFile(with configurationPath: String, projectPath: St
 
     fileManager.changeCurrentDirectoryPath(packagePath)
     do {
-        try configurationContent.write(toFile: "AutoLocalizedCore/Sources/AutoLocalized/SupportingFiles/Configuration.swift", atomically: true, encoding: .utf8)
+        try configurationContent.write(toFile: "Sources/AutoLocalizedCore/SupportingFiles/Configuration.swift", atomically: true, encoding: .utf8)
     } catch {
         exit(EXIT_FAILURE)
     }
