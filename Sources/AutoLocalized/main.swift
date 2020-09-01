@@ -80,7 +80,7 @@ DispatchQueue.global(qos: .background).async {
 // MARK: - Completion
 
 group.wait()
-print(violations)
+print(violations: violations)
 
 print("Finished with \(violations.isEmpty ? "✅ SUCCESS" : "❌ ERRORS FOUND")")
 violations.isEmpty ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
