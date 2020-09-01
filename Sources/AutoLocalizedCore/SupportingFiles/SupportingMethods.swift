@@ -7,6 +7,15 @@
 
 import Foundation
 
+public func print(violation: [Violation]) {
+    violation.forEach({ violation in
+        if let file = violation.rule.row.file {
+            let filePathAndLine: String = "\(FileManager.default.currentDirectoryPath)/\(file.path):\(violation.rule.row.number)"
+            print("\(filePathAndLine): \(violation.rawValue): \(violation.rule.errorString)")
+        }
+    })
+}
+
 /// Returns a list of strings that match regex pattern from content
 ///
 /// - Parameters:
@@ -20,23 +29,4 @@ public func regexFor(_ pattern: String, content: String, rangeIndex: Int = 0) ->
         guard let range = Range($0.range(at: rangeIndex), in: content) else { fatalError("Incorrect range match") }
         return String(content[range])
     }
-}
-
-/// Copy the content of the configuration file located in your project
-///
-/// - Parameters:
-///   - configurationPathComponent: path for configuration file
-///   - projectPath: path for your project
-public func setConfigurationFile(with configurationPath: String, projectPath: String, packagePath: String, fileManager: FileManager) {
-    fileManager.changeCurrentDirectoryPath(projectPath)
-    guard let data = fileManager.contents(atPath: projectPath  + configurationPath), let configurationContent = String(data: data, encoding: .utf8) else { fatalError("Could not read from path: \(projectPath)") }
-
-    fileManager.changeCurrentDirectoryPath(packagePath)
-    do {
-        try configurationContent.write(toFile: "Sources/AutoLocalizedCore/SupportingFiles/Configuration.swift", atomically: true, encoding: .utf8)
-    } catch {
-        exit(EXIT_FAILURE)
-    }
-    fileManager.changeCurrentDirectoryPath(projectPath)
-    FileManager.default.changeCurrentDirectoryPath(projectPath)
 }

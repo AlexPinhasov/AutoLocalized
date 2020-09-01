@@ -9,44 +9,112 @@ final class AutoLocalizedTests: XCTestCase {
 
     lazy var thisDirectory = URL(fileURLWithPath: #file).deletingLastPathComponent().absoluteString.replacingOccurrences(of: "file://", with: "")
     lazy var englishLocalizationFilePath = thisDirectory + "Localize/english.strings"
+    lazy var spanishLocalizationFilePath = thisDirectory + "Localize/spanish.strings"
 
     static var allTests = [
         ("testLocalizationFileSortedCorrectly", testLocalizationFileSortedCorrectly),
     ]
 
     override func setUpWithError() throws {
-        setupEnglishLocalizeFile()
+
     }
 
     override func tearDownWithError() throws {
-        tearDownEnglishLocalizeFile()
+        tearDownLocalizeFile(for: englishLocalizationFilePath)
+        tearDownLocalizeFile(for: spanishLocalizationFilePath)
     }
 
     // MARK: Testing
 
     func testLocalizationFileSortedCorrectly() {
-        XCTAssertTrue(englishLocalization.rows.compactMap({ $0.key }).isAscending(), "Localization file are not sorted")
-    }
-
-    func testMoreThenOneKey() {
-        
-    }
-}
-
-extension AutoLocalizedTests {
-    private func setupEnglishLocalizeFile() {
-        let englishContent: String =
+        let content: String =
         """
             "candle" = "Candle";
             "about" = "Yes";
             "base" = "No";
         """
-
-        XCTAssertNoThrow(try englishContent.write(toFile: englishLocalizationFilePath, atomically: true, encoding: .utf8))
-        englishLocalization = LocalizeFile(path: englishLocalizationFilePath)
+        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        XCTAssertTrue(englishLocalization.rows.compactMap({ $0.key }).isAscending(), "Localization file are not sorted")
     }
 
-    private func tearDownEnglishLocalizeFile() {
-        XCTAssertNoThrow(try "".write(toFile: englishLocalizationFilePath, atomically: true, encoding: .utf8))
+    func testMoreThenOneKeyViolation() {
+        let content: String =
+        """
+            "candle" = "Candle";
+            "about" = "Yes";
+            "about" = "Duplicate";
+            "base" = "No";
+            "base" = "Seconds Duplicate";
+        """
+        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        let violations = validateDuplicateKeys(in: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule == .duplicateKey }).count == 4, "No Duplicates found")
+    }
+
+    func testAllLocalizationFilesKeysMatch() {
+        let content: String =
+        """
+            "candle" = "Candle";
+            "about" = "Yes";
+            "base" = "Seconds Duplicate";
+        """
+        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        spanishLocalization = setupLocalizeFile(with: content, for: spanishLocalizationFilePath)
+        let violations = validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
+        XCTAssert(violations.filter({ $0.rule == .localizeFilesDontMatch }).isEmpty, "Localization files dont match")
+    }
+
+    func testAllLocalizationFilesKeysDontMatch() {
+        let englishContent: String =
+        """
+            "candle" = "Candle";
+            "about" = "Yes";
+            "base" = "Seconds Duplicate";
+        """
+
+        let spanishContent: String =
+        """
+            "candle" = "Candle";
+            "base" = "Seconds Duplicate";
+        """
+        englishLocalization = setupLocalizeFile(with: englishContent, for: englishLocalizationFilePath)
+        spanishLocalization = setupLocalizeFile(with: spanishContent, for: spanishLocalizationFilePath)
+        let violations = validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
+        XCTAssert(!violations.filter({ $0.rule == .localizeFilesDontMatch }).isEmpty, "Localization files dont match")
+    }
+
+    func testMissingKeys() {
+        let content: String =
+        """
+            "candle" = "Candle";
+            "base" = "Seconds Duplicate";
+        """
+        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        let file = ProjectFile(path: thisDirectory + "Files/File.swift")
+        let violations = validateMissingKeys(from: [file], in: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule == .missingKey }).count == 1, "Should throw an error for missing key")
+    }
+
+    func testDeadKeys() {
+        let content: String =
+        """
+            "candle" = "Candle";
+            "base" = "Seconds Duplicate";
+        """
+        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        let file = ProjectFile(path: thisDirectory + "Files/File.swift")
+        let violations = validateDeadKeys(from: [file], in: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule == .deadKey }).count == 2, "Should throw a warning for dead key")
+    }
+}
+
+extension AutoLocalizedTests {
+    private func setupLocalizeFile(with content: String, for path: String) -> LocalizeFile {
+        XCTAssertNoThrow(try content.write(toFile: path, atomically: true, encoding: .utf8))
+        return LocalizeFile(path: path)
+    }
+
+    private func tearDownLocalizeFile(for path: String) {
+        XCTAssertNoThrow(try "".write(toFile: path, atomically: true, encoding: .utf8))
     }
 }

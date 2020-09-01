@@ -10,8 +10,7 @@ guard !projectPath.isEmpty else { fatalError("Missing arguments in build phase")
 
 var scriptFinishedWithoutErrors = true
 public let fileManager = FileManager.default
-let packagePath = FileManager.default.currentDirectoryPath
-setConfigurationFile(with: configurationPath, projectPath: projectPath, packagePath: packagePath, fileManager: fileManager)
+FileManager.default.changeCurrentDirectoryPath(projectPath)
 
 /// List of files in currentPath - recursive
 var pathFiles: [String] = {
@@ -67,20 +66,23 @@ localizableFiles.forEach({ $0.writeSorted() })
 
 let group = DispatchGroup()
 group.enter()
+var violations: [Violation] = []
 
 // MARK: - Validation
 DispatchQueue.global(qos: .background).async {
-    validateLocalizationKeysMatch(in: localizableFiles)
-    validateDuplicateKeys(in: localizableFiles)
-    validateMissingKeys(from: projectFiles, in: localizableFiles)
-    validateDeadKeys(from: projectFiles, in: localizableFiles)
+    violations.append(contentsOf: validateLocalizationKeysMatch(in: localizableFiles))
+    violations.append(contentsOf: validateDuplicateKeys(in: localizableFiles))
+    violations.append(contentsOf: validateMissingKeys(from: projectFiles, in: localizableFiles))
+    violations.append(contentsOf: validateDeadKeys(from: projectFiles, in: localizableFiles))
     group.leave()
 }
 
 // MARK: - Completion
 
 group.wait()
-print("Finished with \(scriptFinishedWithoutErrors ? "✅ SUCCESS" : "❌ ERRORS FOUND")")
-scriptFinishedWithoutErrors ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
+print(violations)
+
+print("Finished with \(violations.isEmpty ? "✅ SUCCESS" : "❌ ERRORS FOUND")")
+violations.isEmpty ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
 
 
