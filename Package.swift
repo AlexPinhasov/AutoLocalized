@@ -6,6 +6,7 @@ import PackageDescription
 let package = Package(
     name: "AutoLocalized",
     products: [
+        .library(name: "AutoLocalizedCore", targets: ["AutoLocalizedCore"]),
         .executable(name: "AutoLocalized", targets: ["AutoLocalized"])
     ],
     targets: [

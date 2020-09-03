@@ -6,6 +6,7 @@ final class AutoLocalizedTests: XCTestCase {
 
     var englishLocalization: LocalizeFile!
     var spanishLocalization: LocalizeFile!
+    var validators = Validators()
 
     lazy var thisDirectory = URL(fileURLWithPath: #file).deletingLastPathComponent().absoluteString.replacingOccurrences(of: "file://", with: "")
     lazy var englishLocalizationFilePath = thisDirectory + "Localize/english.strings"
@@ -16,7 +17,7 @@ final class AutoLocalizedTests: XCTestCase {
     ]
 
     override func setUpWithError() throws {
-
+        
     }
 
     override func tearDownWithError() throws {
@@ -47,8 +48,8 @@ final class AutoLocalizedTests: XCTestCase {
             "base" = "Seconds Duplicate";
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
-        let violations = validateDuplicateKeys(in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .duplicateKey }).count == 4, "No Duplicates found")
+        let violations = validators.validateDuplicateKeys(in: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule is MatchRule }).count == 4, "No Duplicates found")
     }
 
     func testAllLocalizationFilesKeysMatch() {
@@ -60,8 +61,8 @@ final class AutoLocalizedTests: XCTestCase {
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         spanishLocalization = setupLocalizeFile(with: content, for: spanishLocalizationFilePath)
-        let violations = validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .localizeFilesDontMatch }).isEmpty, "Localization files dont match")
+        let violations = validators.validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
+        XCTAssert(violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
     func testAllLocalizationFilesKeysDontMatch() {
@@ -79,8 +80,8 @@ final class AutoLocalizedTests: XCTestCase {
         """
         englishLocalization = setupLocalizeFile(with: englishContent, for: englishLocalizationFilePath)
         spanishLocalization = setupLocalizeFile(with: spanishContent, for: spanishLocalizationFilePath)
-        let violations = validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
-        XCTAssert(!violations.filter({ $0.rule == .localizeFilesDontMatch }).isEmpty, "Localization files dont match")
+        let violations = validators.validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
+        XCTAssert(!violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
     func testMissingKeys() {
@@ -91,8 +92,8 @@ final class AutoLocalizedTests: XCTestCase {
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         let file = ProjectFile(path: thisDirectory + "Files/File.swift")
-        let violations = validateMissingKeys(from: [file], in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .missingKey }).count == 1, "Should throw an error for missing key")
+        let violations = validators.validateMissingKeys(from: [file], in: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule is MissingRule }).count == 1, "Should throw an error for missing key")
     }
 
     func testDeadKeys() {
@@ -103,8 +104,8 @@ final class AutoLocalizedTests: XCTestCase {
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         let file = ProjectFile(path: thisDirectory + "Files/File.swift")
-        let violations = validateDeadKeys(from: [file], in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .deadKey }).count == 2, "Should throw a warning for dead key")
+        let violations = validators.validateDeadKeys(from: [file], in: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule is DeadRule }).count == 2, "Should throw a warning for dead key")
     }
 }
 

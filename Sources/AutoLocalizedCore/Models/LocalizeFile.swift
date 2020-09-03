@@ -16,6 +16,7 @@ public class LocalizeFile: File {
         self.rows = parseRows()
         rows.sort(by: { $0.key < $1.key })
         rows.enumerated().forEach({ $1.number = $0 + 1 })
+        writeSorted()
     }
 
     /// Parses contents of a file to localizable keys and values - Throws error if localizable file have duplicated keys
