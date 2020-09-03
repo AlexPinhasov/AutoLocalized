@@ -10,9 +10,11 @@ import Foundation
 public typealias CustomValidator = ([File], [LocalizeFile]) -> [Violation]
 public class Validators {
 
-    public var customValidators: [CustomValidator] = []
+    var customValidators: [CustomValidator] = []
 
-    public init() {}
+    public init() {
+        customValidators = Configurations.customValidators
+    }
 
     public func execute() -> [Violation] {
         var violations: [Violation] = []

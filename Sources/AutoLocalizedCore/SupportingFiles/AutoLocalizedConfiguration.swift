@@ -9,3 +9,7 @@ public enum Configurations {
     /// Exclude directories you want to ignore.
     public static let excludedDirectories = [""]
 }
+
+extension Configurations {
+    public static var customValidators: [CustomValidator] = []
+}
