@@ -7,14 +7,9 @@
 
 import Foundation
 
-public typealias CustomValidator = ([File], [LocalizeFile]) -> [Violation]
 public class Validators {
 
-    var customValidators: [CustomValidator] = []
-
-    public init() {
-        customValidators = Configurations.customValidators
-    }
+    public init() {}
 
     public func execute() -> [Violation] {
         var violations: [Violation] = []
@@ -22,7 +17,7 @@ public class Validators {
         violations.append(contentsOf: validateDuplicateKeys(in: localizableFiles))
         violations.append(contentsOf: validateMissingKeys(from: projectFiles, in: localizableFiles))
         violations.append(contentsOf: validateDeadKeys(from: projectFiles, in: localizableFiles))
-        customValidators.forEach({ violations.append(contentsOf: $0(projectFiles, localizableFiles)) })
+        violations.append(contentsOf: CustomValidators.genericValidator(projectFiles: projectFiles, localizeFiles: localizableFiles))
         return violations
     }
 

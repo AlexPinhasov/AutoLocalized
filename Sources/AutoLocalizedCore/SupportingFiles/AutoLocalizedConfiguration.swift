@@ -1,6 +1,9 @@
 ///
 /// Use this configuration file to manage AutoLocalized search files and directories
 ///
+
+import Foundation
+
 public enum Configurations {
 
     /// What extension to you want to support.
@@ -10,6 +13,8 @@ public enum Configurations {
     public static let excludedDirectories = [""]
 }
 
-extension Configurations {
-    public static var customValidators: [CustomValidator] = []
+enum CustomValidators {
+    static func genericValidator(projectFiles: [File], localizeFiles: [LocalizeFile]) -> [Violation] {
+        return []
+    }
 }
