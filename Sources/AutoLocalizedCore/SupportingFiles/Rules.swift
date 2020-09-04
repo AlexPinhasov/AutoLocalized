@@ -30,7 +30,7 @@ public struct MissingRule: Rule {
     public var description: String = "Search for missing keys in localization files found in project files"
     public var row: Row
     public var errorString: String {
-         "🔑 \"%@\" is missing in strings files.".withArguments([row.key])
+         "🔑 \"%@\" is missing from localization files.".withArguments([row.key])
     }
 }
 
