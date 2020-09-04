@@ -63,7 +63,7 @@ enum CustomValidators {
 
 Example -> 
 
-![GitHub Logo](/images/configurationFileExample.png)
+![GitHub Logo](/Images/configurationFileExample.png)
 
 
 ## Installation
