@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="http://www.amitmerchant.com/electron-markdownify"></a>
-  <br>AutoLocalized<br>
+  ![GitHub Logo](/Images/AutoLocalizedLogo.png)
 </h1>
 
 <h4 align="center">A tool to manage localization in your project</h4>
