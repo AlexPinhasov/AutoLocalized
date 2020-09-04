@@ -2,8 +2,10 @@
 <p align="center">
 <img src="/Images/AutoLocalizedLogo.png" width="370" height="77">
 </p>
-
 <h4 align="center">A tool to manage localization in your project</h4>
+<p align="center">
+<img src="/Images/Example.png">
+</p>
 
 <p align="center">
   <img alt="Platform" src="https://img.shields.io/cocoapods/p/EqualableGeneric.svg">
@@ -12,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="#example">Example</a> •
+  <a href="#behindthescenes">Behind the scenes</a> •
   <a href="#installation">Installation</a> •
   <a href="#author">Author</a> •
   <a href="#license">License</a>
@@ -20,7 +22,8 @@
 
 AutoLocalized scans your project and search for your localization files and project files containg localized keys.
 By using Rules and Validation methods ensuring your keys and files are orgnaized, clean and always up to do with your work.
-##
+## Behind the scenes
+
 For every localization file found the folowing is executed:
 - Make sure each row has only 1 key and 1 value.
 - Sort by keys.
