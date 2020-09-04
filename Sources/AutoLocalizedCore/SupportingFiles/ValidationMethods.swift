@@ -20,8 +20,8 @@ public func validateLocalizationKeysMatch(in localizationFiles: [File]) -> [Viol
         let fileSet = Set(file.rows)
         let currentFileExtraKeysRows = fileSet.subtracting(baseSet)
         let englishFileExtraKeysRows = baseSet.subtracting(fileSet)
-        currentFileExtraKeysRows.forEach({ violations.append(.error(MatchRule(forRow: $0))) })
-        englishFileExtraKeysRows.forEach({ violations.append(.error(MatchRule(forRow: $0))) })
+        currentFileExtraKeysRows.forEach({ violations.append(.error(MatchRule(row: $0))) })
+        englishFileExtraKeysRows.forEach({ violations.append(.error(MatchRule(row: $0))) })
     }
     return violations
 }
@@ -39,7 +39,7 @@ public func validateMissingKeys(from files: [File], in localizationFiles: [File]
     files.forEach { file in
         let fileKeysSet = Set(file.rows)
         let extraKeysRows = fileKeysSet.subtracting(baseKeys)
-        extraKeysRows.forEach({ violations.append(.error(MissingRule(forRow: $0))) })
+        extraKeysRows.forEach({ violations.append(.error(MissingRule(row: $0))) })
     }
     return violations
 }
@@ -57,7 +57,7 @@ public func validateDeadKeys(from files: [File], in localizationFiles: [File]) -
     var violations: [Violation] = []
     let baseKeys = Set(baseFile.rows)
     let deadKeys = baseKeys.subtracting(allCodeFileKeys)
-    deadKeys.forEach({ violations.append(.warning(DeadRule(forRow: $0))) })
+    deadKeys.forEach({ violations.append(.warning(DeadRule(row: $0))) })
     return violations
 }
 
@@ -71,8 +71,8 @@ public func validateDuplicateKeys(in localizationFiles: [File]) -> [Violation] {
         var duplicateKeys: [String: Row] = [:]
         file.rows.forEach({ row in
             if duplicateKeys[row.key] != nil, let duplicateRow = duplicateKeys[row.key] {
-                violations.append(contentsOf: [.error(DuplicateRule(forRow: row)),
-                                               .error(DuplicateRule(forRow: duplicateRow))])
+                violations.append(contentsOf: [.error(DuplicateRule(row: row)),
+                                               .error(DuplicateRule(row: duplicateRow))])
             }
             duplicateKeys[row.key] = row
         })

@@ -48,7 +48,7 @@ final class AutoLocalizedTests: XCTestCase {
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         let violations = validateDuplicateKeys(in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .duplicateKey }).count == 4, "No Duplicates found")
+        XCTAssert(violations.filter({ $0.rule is DuplicateRule }).count == 4, "No Duplicates found")
     }
 
     func testAllLocalizationFilesKeysMatch() {
@@ -61,7 +61,7 @@ final class AutoLocalizedTests: XCTestCase {
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         spanishLocalization = setupLocalizeFile(with: content, for: spanishLocalizationFilePath)
         let violations = validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .localizeFilesDontMatch }).isEmpty, "Localization files dont match")
+        XCTAssert(violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
     func testAllLocalizationFilesKeysDontMatch() {
@@ -80,7 +80,7 @@ final class AutoLocalizedTests: XCTestCase {
         englishLocalization = setupLocalizeFile(with: englishContent, for: englishLocalizationFilePath)
         spanishLocalization = setupLocalizeFile(with: spanishContent, for: spanishLocalizationFilePath)
         let violations = validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
-        XCTAssert(!violations.filter({ $0.rule == .localizeFilesDontMatch }).isEmpty, "Localization files dont match")
+        XCTAssert(!violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
     func testMissingKeys() {
@@ -92,7 +92,7 @@ final class AutoLocalizedTests: XCTestCase {
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         let file = ProjectFile(path: thisDirectory + "Files/File.swift")
         let violations = validateMissingKeys(from: [file], in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .missingKey }).count == 1, "Should throw an error for missing key")
+        XCTAssert(violations.filter({ $0.rule is MissingRule }).count == 1, "Should throw an error for missing key")
     }
 
     func testDeadKeys() {
@@ -104,7 +104,7 @@ final class AutoLocalizedTests: XCTestCase {
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         let file = ProjectFile(path: thisDirectory + "Files/File.swift")
         let violations = validateDeadKeys(from: [file], in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule == .deadKey }).count == 2, "Should throw a warning for dead key")
+        XCTAssert(violations.filter({ $0.rule is DeadRule }).count == 2, "Should throw a warning for dead key")
     }
 }
 
