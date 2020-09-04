@@ -20,6 +20,51 @@
 
 ## Example
 
+## Template Files
+AutoLocalizedConfiguration file:
+
+```swift
+///
+/// Use this configuration file to manage AutoLocalized search files and directories
+///
+
+import AutoLocalizedCore
+
+public enum Configurations {
+
+    /// What extension do you want to support.
+    public static let supportedFileExtensions = ["swift", "xib", "storyboard"]
+
+    /// Exclude directories you want to ignore.
+    public static let excludedDirectories = ["AutoLocalizedConfiguration.swift"]
+}
+
+/// Create custom validators for unique cases
+
+enum CustomValidators {
+
+    /// Returns a list of violations found
+    ///
+    /// - Parameters:
+    ///   - projectFiles: Given to you by the framework
+    ///   - localizeFiles: Given to you by the framework
+    /// - Returns: list of Violations
+    static func genericValidator(projectFiles: [AutoLocalizedCore.File], localizeFiles: [LocalizeFile]) -> [Violation] {
+        return []
+    }
+
+    // MARK: - Validation Methods
+
+}
+
+/// Create your own rules
+
+```
+
+Example -> 
+
+![GitHub Logo](/images/configurationFileExample.png)
+
 
 ## Installation
 
