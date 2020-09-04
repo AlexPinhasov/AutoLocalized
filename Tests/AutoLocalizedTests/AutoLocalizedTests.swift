@@ -49,7 +49,7 @@ final class AutoLocalizedTests: XCTestCase {
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
         let violations = validators.validateDuplicateKeys(in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule is MatchRule }).count == 4, "No Duplicates found")
+        XCTAssert(violations.filter({ $0.rule is DuplicateRule }).count == 4, "No Duplicates found")
     }
 
     func testAllLocalizationFilesKeysMatch() {
