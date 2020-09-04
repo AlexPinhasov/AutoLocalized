@@ -1,7 +1,7 @@
-<h1 align="center">
-  <a href="http://www.amitmerchant.com/electron-markdownify"></a>
-  ![GitHub Logo](/Images/AutoLocalizedLogo.png)
-</h1>
+
+<p align="center">
+<img src="/Images/AutoLocalizedLogo.png" width="370" height="77">
+</p>
 
 <h4 align="center">A tool to manage localization in your project</h4>
 
