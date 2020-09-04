@@ -18,7 +18,34 @@
   <a href="#license">License</a>
 </p>
 
-## Example
+AutoLocalized scans your project and search for your localization files and project files containg localized keys.
+By using Rules and Validation methods ensuring your keys and files are orgnaized, clean and always up to do with your work.
+##
+For every localization file found the folowing is executed:
+- Make sure each row has only 1 key and 1 value.
+- Sort by keys.
+- Validate no duplicate keys exist.
+- Validate all localization files keys match.
+- Validate all keys are being used.
+
+For every project file found the following is executed:
+- If a localization key is used in the file but missing from the localization files, show an warning for dead key.
+##
+To Do's:
+- [x] ~~Add support for custom Rules and Validation methods.~~
+- [x] ~~Add support for excluding directories.~~
+- [ ] Identify a value is in the correct language of the localziation file.
+- [ ] Reduce build time. (Copy configuration file only when a change is made, find a way caching the executable)
+
+
+## Installation
+
+AutoLocalized is available through SPM (Swift Package Manager). To install
+it, simply add the repository.
+
+File -> Swift Packages -> Add Package Dependency
+
+Copy git repository path into the search field.
 
 ## Template Files
 AutoLocalizedConfiguration file:
@@ -65,11 +92,6 @@ Example ->
 
 ![GitHub Logo](/Images/configurationFileExample.png)
 
-
-## Installation
-
-AutoLocalized is available through SPM (Swift Package Manager). To install
-it, simply add the repository, File -> Swift Packages -> Add Package Dependency
 
 ## Author
 
