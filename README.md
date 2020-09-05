@@ -99,6 +99,33 @@ Optional Step but recommended
 The configuration file is a gateway to the framework, by copying it to your project you are able to use as part of your other project files.
 If you deleted something inside the file I will attach a "Template Files" section to always have a referencing point.
 
+## Custom Rules And Validation Methods
+
+1. <b>Inside the configuration file (AutoLocalizedConfiguration.swift) you can do the following things:</b>
+  - Choose which files to read from using its extension (.swift, .xib, etc..) 
+  - Exclude any directories the framework shouldn't search in.
+  - Add new custom validation methods.
+  - Add new Rules to have a visual representation in Xcode (Errors, Warnings) with readable context.
+  
+You are given the files collected and the localization files, after you have performed your validation return a [Violation] to see the errors/warnings.
+
+<b>Example -> </b>
+
+<p align="center">
+<img src="/Images/configurationFileExample.png">
+</p>  
+
+2. If you only want to exclude a part of your code use
+```swift
+// autolocalized:disable
+  {your code }
+// autolocalized:enable
+```
+
+<p align="center">
+<img src="/Images/autolocalized_disable.png">
+</p>  
+
 ## Template Files
 AutoLocalizedConfiguration file:
 
@@ -139,12 +166,6 @@ enum CustomValidators {
 /// Create your own rules
 
 ```
-
-Example -> 
-
-<p align="center">
-<img src="/Images/configurationFileExample.png">
-</p>  
 
 
 ## Author
