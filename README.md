@@ -39,6 +39,8 @@ To Do's:
 - [ ] Identify a value is in the correct language of the localization file.
 - [ ] Add Wiki
 - [ ] Finish README.md
+- [ ] Add build and test pass marks
+- [ ] Add support for custom regex for project files, currently search by "(case|return|static let).*?\"([a-z|_]*?)\"" as default.
 
 
 ## Installation
