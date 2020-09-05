@@ -24,14 +24,14 @@ AutoLocalized scans your project and search for your localization files and proj
 By using Rules and Validation methods ensuring your keys and files are orgnaized, clean and always up to do with your work.
 ## Behind the scenes
 
-For every localization file found the folowing is executed:
+<b>For every localization file found the folowing is executed:</b>
 - Make sure each row has only 1 key and 1 value.
 - Sort by keys.
 - Validate no duplicate keys exist.
 - Validate all localization files keys match.
 - Validate all keys are being used.
 
-For every project file found the following is executed:
+<b>For every project file found the following is executed:</b>
 - If a localization key is used in the file but missing from the localization files, show an warning for dead key.
 ##
 To Do's:
