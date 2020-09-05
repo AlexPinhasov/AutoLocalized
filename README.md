@@ -38,7 +38,8 @@ To Do's:
 - [x] ~~Add support for custom Rules and Validation methods.~~
 - [x] ~~Add support for excluding directories.~~
 - [ ] Identify a value is in the correct language of the localziation file.
-- [ ] Reduce build time. (Copy configuration file only when a change is made, find a way caching the executable)
+- [ ] Add Wiki
+- [ ] Finish README.md
 
 
 ## Installation
