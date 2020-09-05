@@ -2,7 +2,7 @@
 <p align="center">
 <img src="/Images/AutoLocalizedLogo.png" width="370" height="77">
 </p>
-<h4 align="center">A tool to manage localization in your project</h4>
+<h4 align="center">A tool to manage localization in your project and show errors and/or warnings when needed.</h4>
 <p align="center">
 <img src="/Images/Example.png">
 </p>
@@ -20,36 +20,84 @@
   <a href="#license">License</a>
 </p>
 
-AutoLocalized scans your project and search for your localization files and project files containg localized keys.
-By using Rules and Validation methods ensuring your keys and files are orgnaized, clean and always up to do with your work.
+AutoLocalized scans your project and search for your localization files and project files containing localized keys. By using Rules and Validation methods ensuring your keys and files are organized, clean, and always up to date with your work.
 ## Behind the scenes
 
-For every localization file found the folowing is executed:
+<b>For every localization file found the following is executed:</b>
 - Make sure each row has only 1 key and 1 value.
 - Sort by keys.
 - Validate no duplicate keys exist.
 - Validate all localization files keys match.
-- Validate all keys are being used.
+- Validate all keys that are being used.
 
-For every project file found the following is executed:
-- If a localization key is used in the file but missing from the localization files, show an warning for dead key.
+<b>For every project file found the following is executed:</b>
+- If a localization key is used in the file but missing from the localization files, show a warning for the dead key.
 ##
 To Do's:
 - [x] ~~Add support for custom Rules and Validation methods.~~
 - [x] ~~Add support for excluding directories.~~
-- [ ] Identify a value is in the correct language of the localziation file.
+- [ ] Identify a value is in the correct language of the localization file.
 - [ ] Add Wiki
 - [ ] Finish README.md
 
 
 ## Installation
+<p align="center">
+<img src="/Images/spi.png" width="100" height="100">
+</p>
+AutoLocalized is available through SPM (Swift Package Manager). To install it, simply follow the next steps.
 
-AutoLocalized is available through SPM (Swift Package Manager). To install
-it, simply add the repository.
+1. <b>Add AutoLocalized as a dependecy using SPM:</b>
+   - File -> Swift Packages -> Add Package Dependency
 
-File -> Swift Packages -> Add Package Dependency
+<p align="center">
+<img src="/Images/SPM.png" width="730" height="434">
+</p>
 
-Copy git repository path into the search field.
+2. <b>Create a "New Run Script Phase" under you target in "Build Phases" tab and copy the script below.</b>
+
+```Shell
+SDKROOT=macosx
+
+# Copy Configuration file
+cp -f -v ${PROJECT_DIR}/${PROJECT_NAME}/AutoLocalizedConfiguration.swift ~/Library/Developer/Xcode/DerivedData/${PROJECT_NAME}-*/SourcePackages/checkouts/AutoLocalized/Sources/AutoLocalizedCore/SupportingFiles/AutoLocalizedConfiguration.swift
+
+# Move to the AutoLocalized folder
+cd ~/Library/Developer/Xcode/DerivedData/${PROJECT_NAME}-*/SourcePackages/checkouts/AutoLocalized
+
+# Build and create a release 
+swift run -c release
+
+# Execute script
+/.build/release/AutoLocalized ${PROJECT_DIR}/${PROJECT_NAME}
+
+```
+
+<p align="center">
+<img src="/Images/bash.png">
+</p>
+
+3. <b>Copy the configuration file named "AutoLocalizedConfiguration.swift" and place it in your project directory.</b>
+   - The file can be found here: 
+     - Right click on the AutoLocalized Package and "Show in Finder"
+     - Navigate to "Sources/AutoLocalizedCore/SupportingFiles" and copy from there.  
+<p align="center">
+<img src="/Images/configurationFile.png">
+</p>  
+
+     - The file must be copied here ${PROJECT_DIR}/${PROJECT_NAME}/AutoLocalizedConfiguration.swift
+  
+Optional Step but recommended   
+4. <b>Link the file inside your project in Xcode to be able to modify it quickly and add new Rules/Validations/Supported File Extensions/Excluded Directories.</b>
+   - Right-click on your selected folder in your project "Add files to {YourProjects}"
+   - Find the new file we have just copied and select it (AutoLocalizedConfiguration.swift)
+   
+<p align="center">
+<img src="/Images/fileExample.png">
+</p>  
+
+The configuration file is a gateway to the framework, by copying it to your project you are able to use as part of your other project files.
+If you deleted something inside the file I will attach a "Template Files" section to always have a referencing point.
 
 ## Template Files
 AutoLocalizedConfiguration file:
@@ -94,7 +142,9 @@ enum CustomValidators {
 
 Example -> 
 
-![GitHub Logo](/Images/configurationFileExample.png)
+<p align="center">
+<img src="/Images/configurationFileExample.png">
+</p>  
 
 
 ## Author
