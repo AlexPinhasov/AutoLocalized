@@ -20,10 +20,10 @@ public class ConfigurationParser {
       -
     """
 
-    public static func decode() -> Configuration {
+    public static func decode(data: Data? = nil) -> Configuration {
         do {
             guard let readYamlData = readYamlData else { fatalError("Cant decode yaml file") }
-            return try YAMLDecoder().decode(Configuration.self, from: readYamlData)
+            return try YAMLDecoder().decode(Configuration.self, from: data ?? readYamlData)
         } catch {
             fatalError("Cant decode yaml file")
         }

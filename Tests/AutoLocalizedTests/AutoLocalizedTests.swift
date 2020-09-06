@@ -6,7 +6,8 @@ final class AutoLocalizedTests: XCTestCase {
 
     var englishLocalization: LocalizeFile!
     var spanishLocalization: LocalizeFile!
-    var validators = Validators()
+    var validators: Validators!
+    var configuration: Configuration!
 
     lazy var thisDirectory = URL(fileURLWithPath: #file).deletingLastPathComponent().absoluteString.replacingOccurrences(of: "file://", with: "")
     lazy var englishLocalizationFilePath = thisDirectory + "Localize/english.strings"
@@ -17,7 +18,10 @@ final class AutoLocalizedTests: XCTestCase {
     ]
 
     override func setUpWithError() throws {
-        
+        if let yamlDefaultData = ConfigurationParser.baseYamlContent.data(using: .utf8) {
+            configuration = ConfigurationParser.decode(data: yamlDefaultData)
+            validators = Validators(for: configuration)
+        }
     }
 
     override func tearDownWithError() throws {
@@ -91,7 +95,9 @@ final class AutoLocalizedTests: XCTestCase {
             "base" = "Seconds Duplicate";
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
-        let file = ProjectFile(path: thisDirectory + "Files/File.swift")
+        let fileExtension = configuration.supportedFileExtensions.first(where: { $0.extension == "swift" })
+        XCTAssertFalse(fileExtension == nil, "Cant find Swift file extension in yaml file")
+        let file = ProjectFile(path: thisDirectory + "Files/File.swift", fileExtension: fileExtension!)
         let violations = validators.validateMissingKeys(from: [file], in: [englishLocalization])
         XCTAssert(violations.filter({ $0.rule is MissingRule }).count == 1, "Should throw an error for missing key")
     }
@@ -103,7 +109,9 @@ final class AutoLocalizedTests: XCTestCase {
             "base" = "Seconds Duplicate";
         """
         englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
-        let file = ProjectFile(path: thisDirectory + "Files/File.swift")
+        let fileExtension = configuration.supportedFileExtensions.first(where: { $0.extension == "swift" })
+        XCTAssertFalse(fileExtension == nil, "Cant find Swift file extension in yaml file")
+        let file = ProjectFile(path: thisDirectory + "Files/File.swift", fileExtension: fileExtension!)
         let violations = validators.validateDeadKeys(from: [file], in: [englishLocalization])
         XCTAssert(violations.filter({ $0.rule is DeadRule }).count == 2, "Should throw a warning for dead key")
     }
