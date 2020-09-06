@@ -10,7 +10,7 @@ import Yams
 
 public class Configuration {
 
-    init() {
+    public init() {
         let file = try? Yams.load(yaml: FileManager.default.currentDirectoryPath + "/.swiftlint.yml")
         print(file)
     }
