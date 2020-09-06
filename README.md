@@ -66,10 +66,6 @@ swift run -c release AutoLocalized ${PROJECT_DIR}/${PROJECT_NAME}
 
 ```
 
-<p align="center">
-<img src="/Images/shell_script.png">
-</p>
-
 3. <b>Build the project, in your project file you will find a ".autolocalized.yml" configuration file.</b>
   
 ## Disable Auto localized
