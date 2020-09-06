@@ -7,6 +7,7 @@ FileManager.default.changeCurrentDirectoryPath(projectPath)
 let group = DispatchGroup()
 group.enter()
 var violations: [Violation] = []
+var confi = Configuration()
 
 // MARK: - Validation
 

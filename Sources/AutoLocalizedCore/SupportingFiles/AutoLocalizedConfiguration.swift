@@ -3,6 +3,7 @@
 ///
 
 import Foundation
+import Yams
 
 public enum Configurations {
 

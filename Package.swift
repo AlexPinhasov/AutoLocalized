@@ -9,9 +9,12 @@ let package = Package(
         .library(name: "AutoLocalizedCore", targets: ["AutoLocalizedCore"]),
         .executable(name: "AutoLocalized", targets: ["AutoLocalized"])
     ],
+    dependencies: [
+        .package(name: "Yams", url: "https://github.com/jpsim/Yams.git", from: "4.0.0")
+    ],
     targets: [
         .target(name: "AutoLocalized", dependencies: ["AutoLocalizedCore"]),
-        .target(name: "AutoLocalizedCore"),
+        .target(name: "AutoLocalizedCore", dependencies: ["Yams"]),
         .testTarget(name: "AutoLocalizedTests", dependencies: ["AutoLocalized"]),
     ]
 )
