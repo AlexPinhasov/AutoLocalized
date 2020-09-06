@@ -7,12 +7,12 @@ FileManager.default.changeCurrentDirectoryPath(projectPath)
 let group = DispatchGroup()
 group.enter()
 var violations: [Violation] = []
-var confi = Configuration()
 
 // MARK: - Validation
 
 DispatchQueue.global(qos: .background).async {
-    violations = Validators().execute()
+    let configuration = ConfigurationParser.decode()
+    violations = Validators(for: configuration).execute()
     group.leave()
 }
 

@@ -9,15 +9,20 @@ import Foundation
 
 public class Validators {
 
-    public init() {}
+    private let fileFinder: FileFinder
+    private let configuration: Configuration
+
+    public init(for configuration: Configuration) {
+        self.configuration = configuration
+        self.fileFinder = FileFinder(with: configuration)
+    }
 
     public func execute() -> [Violation] {
         var violations: [Violation] = []
-        violations.append(contentsOf: validateLocalizationKeysMatch(in: localizableFiles))
-        violations.append(contentsOf: validateDuplicateKeys(in: localizableFiles))
-        violations.append(contentsOf: validateMissingKeys(from: projectFiles, in: localizableFiles))
-        violations.append(contentsOf: validateDeadKeys(from: projectFiles, in: localizableFiles))
-        violations.append(contentsOf: CustomValidators.genericValidator(projectFiles: projectFiles, localizeFiles: localizableFiles))
+        violations.append(contentsOf: validateLocalizationKeysMatch(in: fileFinder.localizableFiles))
+        violations.append(contentsOf: validateDuplicateKeys(in: fileFinder.localizableFiles))
+        violations.append(contentsOf: validateMissingKeys(from: fileFinder.projectFiles, in: fileFinder.localizableFiles))
+        violations.append(contentsOf: validateDeadKeys(from: fileFinder.projectFiles, in: fileFinder.localizableFiles))
         return violations
     }
 

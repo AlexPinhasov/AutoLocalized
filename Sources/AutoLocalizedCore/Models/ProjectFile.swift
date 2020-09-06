@@ -10,9 +10,11 @@ import Foundation
 public class ProjectFile: File {
     public var path: String
     public var rows: [Row] = []
+    public var fileExtension: FileExtension
 
-    public init(path: String) {
+    public init(path: String, fileExtension: FileExtension) {
         self.path = path
+        self.fileExtension = fileExtension
         self.rows = parseRows()
     }
 
@@ -30,14 +32,8 @@ public class ProjectFile: File {
                 shouldSkipLine = true
                 return nil
             }
-            var regexString = ""
 
-            if path.contains("xib") || path.contains("storyboard") {
-                regexString = "(text|title|value|placeholder)=\"([a-z|_]*?)\""
-            } else {
-                regexString = "(case|return|static let).*?\"([a-z|_]*?)\""
-            }
-            var matches = regexFor(regexString, content: stringRow, rangeIndex: 2)
+            var matches = regexFor(fileExtension.regex, content: stringRow, rangeIndex: fileExtension.matchIndex)
             matches.removeAll(where: { $0 == "" || $0 == "\"\"" })
             matches = matches.map({ $0.replacingOccurrences(of: "\"", with: "") })
 
