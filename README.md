@@ -52,7 +52,7 @@ AutoLocalized is available through SPM (Swift Package Manager). To install it, s
 1. <b>Add AutoLocalized as a dependecy using SPM:</b>
    - File -> Swift Packages -> Add Package Dependency
 
-<p align="center">
+<p align="left">
 <img src="/Images/SPM.png" width="730" height="434">
 </p>
 
@@ -67,21 +67,21 @@ swift run -c release AutoLocalized ${PROJECT_DIR}/${PROJECT_NAME}
 ```
 
 <p align="center">
-<img src="/Images/bash.png">
+<img src="/Images/shell_script.png">
 </p>
 
 3. <b>Build the project, in your project file you will find a ".autolocalized.yml" configuration file.</b>
   
-## 
+## Disable Auto localized
 
-2. If you only want to exclude a part of your code use
+If you only want to exclude a part of your code use
 ```swift
 // autolocalized:disable
   {your code }
 // autolocalized:enable
 ```
 
-<p align="center">
+<p align="left">
 <img src="/Images/autolocalized_disable.png">
 </p>  
 
