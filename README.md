@@ -62,6 +62,7 @@ AutoLocalized is available through SPM (Swift Package Manager). To install it, s
 SDKROOT=macosx
 
 cd ~/Library/Developer/Xcode/DerivedData/${PROJECT_NAME}-*/SourcePackages/checkouts/AutoLocalized
+swift build
 swift run -c release AutoLocalized ${PROJECT_DIR}/${PROJECT_NAME}
 
 ```
