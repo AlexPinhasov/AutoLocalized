@@ -68,6 +68,34 @@ swift run -c release AutoLocalized ${PROJECT_DIR}/${PROJECT_NAME}
 ```
 
 3. <b>Build the project, in your project file you will find a ".autolocalized.yml" configuration file.</b>
+
+## Configuration (.autolocalized.yml)
+
+Configure AutoLocalized by adding a .autolocalized.yml file in your project file or building the project once, the framework can create a file when non is found. The following parameters can be configured:
+
+fileExtensions: 
+  - extension to support
+  - regex to search by keys
+  - match_index what index in regex match to select
+  
+excluded: what directories to ignore        
+  - Path
+```yaml
+fileExtensions: # extensions to support (.swift, .xib...).
+  - extension: swift
+    regex: "(case|return|static let).*?\"([a-z|_]*?)\""
+    match_index: 2
+  - extension: xib
+    regex: "(text|title|value|placeholder)=\"([a-z|_]*?)\""
+    match_index: 2
+  - extension: storyboard
+    regex: "(text|title|value|placeholder)=\"([a-z|_]*?)\""
+    match_index: 2
+excluded: # paths to ignore.
+  - Attribution/
+  - Operations/
+  - Localization/LocalizableProtocol
+```
   
 ## Disable Auto localized
 
