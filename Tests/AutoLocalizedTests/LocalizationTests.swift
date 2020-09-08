@@ -2,7 +2,7 @@ import XCTest
 import Foundation
 @testable import AutoLocalizedCore
 
-final class AutoLocalizedTests: XCTestCase {
+final class LocalizationTests: XCTestCase {
 
     var englishLocalization: LocalizeFile!
     var spanishLocalization: LocalizeFile!
@@ -15,6 +15,9 @@ final class AutoLocalizedTests: XCTestCase {
 
     static var allTests = [
         ("testLocalizationFileSortedCorrectly", testLocalizationFileSortedCorrectly),
+        ("testMoreThenOneKeyViolation", testMoreThenOneKeyViolation),
+        ("testAllLocalizationFilesKeysMatch", testAllLocalizationFilesKeysMatch),
+        ("testAllLocalizationFilesKeysDontMatch", testAllLocalizationFilesKeysDontMatch)
     ]
 
     override func setUpWithError() throws {
@@ -25,8 +28,8 @@ final class AutoLocalizedTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        tearDownLocalizeFile(for: englishLocalizationFilePath)
-        tearDownLocalizeFile(for: spanishLocalizationFilePath)
+        tearDownFile(for: englishLocalizationFilePath)
+        tearDownFile(for: spanishLocalizationFilePath)
     }
 
     // MARK: Testing
@@ -38,7 +41,7 @@ final class AutoLocalizedTests: XCTestCase {
             "about" = "Yes";
             "base" = "No";
         """
-        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        englishLocalization = setupFile(with: content, for: englishLocalizationFilePath)
         XCTAssertTrue(englishLocalization.rows.compactMap({ $0.key }).isAscending(), "Localization file are not sorted")
     }
 
@@ -51,7 +54,7 @@ final class AutoLocalizedTests: XCTestCase {
             "base" = "No";
             "base" = "Seconds Duplicate";
         """
-        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
+        englishLocalization = setupFile(with: content, for: englishLocalizationFilePath)
         let violations = validators.validateDuplicateKeys(in: [englishLocalization])
         XCTAssert(violations.filter({ $0.rule is DuplicateRule }).count == 4, "No Duplicates found")
     }
@@ -63,8 +66,8 @@ final class AutoLocalizedTests: XCTestCase {
             "about" = "Yes";
             "base" = "Seconds Duplicate";
         """
-        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
-        spanishLocalization = setupLocalizeFile(with: content, for: spanishLocalizationFilePath)
+        englishLocalization = setupFile(with: content, for: englishLocalizationFilePath)
+        spanishLocalization = setupFile(with: content, for: spanishLocalizationFilePath)
         let violations = validators.validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
         XCTAssert(violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
@@ -82,48 +85,22 @@ final class AutoLocalizedTests: XCTestCase {
             "candle" = "Candle";
             "base" = "Seconds Duplicate";
         """
-        englishLocalization = setupLocalizeFile(with: englishContent, for: englishLocalizationFilePath)
-        spanishLocalization = setupLocalizeFile(with: spanishContent, for: spanishLocalizationFilePath)
+        englishLocalization = setupFile(with: englishContent, for: englishLocalizationFilePath)
+        spanishLocalization = setupFile(with: spanishContent, for: spanishLocalizationFilePath)
         let violations = validators.validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
         XCTAssert(!violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
-    func testMissingKeys() {
-        let content: String =
-        """
-            "candle" = "Candle";
-            "base" = "Seconds Duplicate";
-        """
-        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
-        let fileExtension = configuration.supportedFileExtensions.first(where: { $0.extension == "swift" })
-        XCTAssertFalse(fileExtension == nil, "Cant find Swift file extension in yaml file")
-        let file = ProjectFile(path: thisDirectory + "Files/File.swift", fileExtension: fileExtension!)
-        let violations = validators.validateMissingKeys(from: [file], in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule is MissingRule }).count == 1, "Should throw an error for missing key")
-    }
 
-    func testDeadKeys() {
-        let content: String =
-        """
-            "candle" = "Candle";
-            "base" = "Seconds Duplicate";
-        """
-        englishLocalization = setupLocalizeFile(with: content, for: englishLocalizationFilePath)
-        let fileExtension = configuration.supportedFileExtensions.first(where: { $0.extension == "swift" })
-        XCTAssertFalse(fileExtension == nil, "Cant find Swift file extension in yaml file")
-        let file = ProjectFile(path: thisDirectory + "Files/File.swift", fileExtension: fileExtension!)
-        let violations = validators.validateDeadKeys(from: [file], in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule is DeadRule }).count == 2, "Should throw a warning for dead key")
-    }
 }
 
-extension AutoLocalizedTests {
-    private func setupLocalizeFile(with content: String, for path: String) -> LocalizeFile {
+extension XCTestCase {
+    func setupFile(with content: String, for path: String) -> LocalizeFile {
         XCTAssertNoThrow(try content.write(toFile: path, atomically: true, encoding: .utf8))
         return LocalizeFile(path: path)
     }
 
-    private func tearDownLocalizeFile(for path: String) {
+    func tearDownFile(for path: String) {
         XCTAssertNoThrow(try "".write(toFile: path, atomically: true, encoding: .utf8))
     }
 }
