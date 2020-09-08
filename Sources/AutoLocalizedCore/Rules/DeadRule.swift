@@ -1,5 +1,5 @@
 //
-//  File 3.swift
+//  DeadRule.swift
 //  
 //
 //  Created by Alex Pinhasov on 06/09/2020.
