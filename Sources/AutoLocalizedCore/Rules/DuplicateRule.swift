@@ -1,5 +1,5 @@
 //
-//  File 2.swift
+//  DuplicateRule.swift
 //  
 //
 //  Created by Alex Pinhasov on 06/09/2020.
