@@ -15,8 +15,23 @@ public class Configuration: Codable {
     /// Exclude directories you want to ignore.
     public private(set) var excludedDirectories: [String] = [""]
 
+    public private(set) var disabledRules: [String] = [""]
+
+    lazy var activeRules: [Rule] = {
+        var rules: [Rule] = [DeadRule(), DuplicateKeyRule(), DuplicateValueRule(), MatchRule(), MissingRule()]
+        rules.removeAll(where: { disabledRules.contains($0.name) })
+        return rules
+    }()
+
     enum CodingKeys: String, CodingKey {
-        case supportedFileExtensions = "fileExtensions", excludedDirectories = "excluded"
+        case supportedFileExtensions = "fileExtensions", excludedDirectories = "excluded", disabledRules
+    }
+
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        supportedFileExtensions = try container.decode([FileExtension].self, forKey: .supportedFileExtensions)
+        excludedDirectories = try container.decodeIfPresent([String].self, forKey: .excludedDirectories) ?? []
+        disabledRules = try container.decodeIfPresent([String].self, forKey: .disabledRules) ?? []
     }
 }
 

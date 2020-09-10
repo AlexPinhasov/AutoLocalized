@@ -18,6 +18,8 @@ public class ConfigurationParser {
         match_index: 1
     excluded: # paths to ignore.
       -
+    disabledRules: # rules to ignore
+      -
     """
 
     public static func decode(data: Data? = nil) -> Configuration {
