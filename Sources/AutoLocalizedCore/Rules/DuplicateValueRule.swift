@@ -29,8 +29,8 @@ public struct DuplicateValueRule: Rule {
             var duplicateValues: [String: Row] = [:]
             file.rows.forEach({ row in
                 if duplicateValues[row.value] != nil, let duplicateRow = duplicateValues[row.value] {
-                    violations.append(contentsOf: [.error(DuplicateValueRule(row: row, rowLinked: duplicateRow)),
-                                                   .error(DuplicateValueRule(row: duplicateRow, rowLinked: row))])
+                    violations.append(contentsOf: [.warning(DuplicateValueRule(row: row, rowLinked: duplicateRow)),
+                                                   .warning(DuplicateValueRule(row: duplicateRow, rowLinked: row))])
                 }
                 duplicateValues[row.value] = row
             })
