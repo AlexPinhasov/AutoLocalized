@@ -9,8 +9,8 @@ import Foundation
 
 public func print(violations: [Violation]) {
     violations.forEach({ violation in
-        if let file = violation.rule.row.file {
-            let filePathAndLine: String = "\(FileManager.default.currentDirectoryPath)/\(file.path):\(violation.rule.row.number)"
+        if let row = violation.rule.row, let file = row.file {
+            let filePathAndLine: String = "\(FileManager.default.currentDirectoryPath)/\(file.path):\(row.number)"
             print("\(filePathAndLine): \(violation.rawValue): \(violation.rule.errorString)")
         }
     })
