@@ -95,6 +95,8 @@ excluded: # paths to ignore.
   - Attribution/
   - Operations/
   - Localization/LocalizableProtocol
+disabledRules: # ignore rules by specefing their names
+  - duplicateValue
 ```
   
 ## Disable Auto localized
