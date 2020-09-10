@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  FileFinder.swift
 //  
 //
 //  Created by Alex Pinhasov on 03/09/2020.
@@ -9,7 +9,11 @@ import Foundation
 
 class FileFinder {
 
+    // MARK: - Properties
+
     private let configuration: Configuration
+
+    // MARK: - Init
 
     init(with configuration: Configuration) {
         self.configuration = configuration
@@ -62,5 +66,4 @@ class FileFinder {
 
         return files
     }()
-
 }

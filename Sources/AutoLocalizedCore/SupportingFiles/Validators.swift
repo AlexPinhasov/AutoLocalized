@@ -1,5 +1,5 @@
 //
-//  ValidationMethods.swift
+//  Validators.swift
 //  
 //
 //  Created by Alex Pinhasov on 17/08/2020.
@@ -9,8 +9,12 @@ import Foundation
 
 public class Validators {
 
+    // MARK: - Properties
+
     private let fileFinder: FileFinder
     private let configuration: Configuration
+
+    // MARK: - Init
 
     public init(for configuration: Configuration) {
         self.configuration = configuration
@@ -25,6 +29,8 @@ public class Validators {
         violations.append(contentsOf: validateDeadKeys(from: fileFinder.projectFiles, in: fileFinder.localizableFiles))
         return violations
     }
+
+    // MARK: - Private validators
 
     /// Validate all localizable files have matching keys
     ///

@@ -8,6 +8,7 @@
 import Foundation
 
 public class FileExtension: Codable {
+
     /// Extension name
     public var `extension`: String
 
@@ -20,5 +21,4 @@ public class FileExtension: Codable {
     enum CodingKeys: String, CodingKey {
         case matchIndex = "match_index", `extension`, regex
     }
-    
 }

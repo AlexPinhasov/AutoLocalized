@@ -14,10 +14,7 @@ public protocol File {
 }
 
 extension File {
-    /// Reads rows in path
-    ///
-    /// - Parameter path: path of file
-    /// - Returns: all rows in file
+    /// Return all string rows in the file
     var allStringRows: [String] {
         guard let data = FileManager.default.contents(atPath: path),
             let content = String(data: data, encoding: .utf8)?.components(separatedBy: .newlines)
@@ -25,10 +22,7 @@ extension File {
         return content
     }
 
-    /// Reads contents in path
-    ///
-    /// - Parameter path: path of file
-    /// - Returns: content in file
+    /// Return the full content of the file
     var content: String {
         guard let data = FileManager.default.contents(atPath: path),
             let content = String(data: data, encoding: .utf8)

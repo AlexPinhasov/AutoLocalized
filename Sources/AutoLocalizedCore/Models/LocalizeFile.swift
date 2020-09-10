@@ -7,23 +7,26 @@
 
 import Foundation
 
-public class LocalizeFile: File {
-    public var path: String
-    public var rows: [Row] = []
+class LocalizeFile: File {
 
-    public init(path: String) {
+    // MARK: - Properties
+
+    var path: String
+    var rows: [Row] = []
+
+    // MARK: - Init
+
+    init(path: String) {
         self.path = path
         self.rows = parseRows()
         rows.sort(by: { $0.key < $1.key })
-        rows.enumerated().forEach({ $1.number = $0 + 1 })
+        rows.enumerated().forEach({ $1.setNewRowNumber($0 + 1) })
         writeSorted()
     }
 
-    /// Parses contents of a file to localizable keys and values - Throws error if localizable file have duplicated keys
-    ///
-    /// - Parameter path: Localizable file paths
-    /// - Returns: localizable key and value for content at path
-    public func parseRows() -> [Row] {
+    /// Parses rows in file - Throws error if localizable file have duplicated keys
+    /// - Returns: A list of rows in file
+    func parseRows() -> [Row] {
         var foundErrorInRegex = false
 
         let rows: [Row] = allStringRows.enumerated().compactMap({ index, rowString in
@@ -48,8 +51,9 @@ public class LocalizeFile: File {
         return rows
     }
 
-    /// Writes back to localizable file
-    public func writeSorted() {
+    /// Sort keys and write to file
+
+    func writeSorted() {
         do {
             let content = rows.compactMap { $0.keyValue }.joined(separator: "\n")
             guard !content.isEmpty else { fatalError("Cant get \(path) content") }
