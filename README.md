@@ -80,6 +80,9 @@ fileExtensions:
   
 excluded: what directories to ignore        
   - Path
+  
+disabledRules: what rules to ignore        
+  - duplicateValue
 ```yaml
 fileExtensions: # extensions to support (.swift, .xib...).
   - extension: swift
@@ -110,6 +113,14 @@ If you only want to exclude a part of your code use
 
 <p align="left">
 <img src="/Images/autolocalized_disable.png">
+</p>  
+
+## Output
+
+In your "Build report" in Xcode, you will see all the files that were found using your <b>.autolocalized.yml</b> configuration, separated by file type. In addition, you will see the number of keys in that files and the keys.
+
+<p align="left">
+<img src="/Images/Terminal output.png">
 </p>  
 
 ## Author
