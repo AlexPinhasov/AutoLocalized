@@ -28,12 +28,12 @@ final class ProjectFileTests: XCTestCase {
     }
 
     func testMissingKeys() {
-        let violations = validators.validateMissingKeys(from: [projectFile], in: [englishLocalization])
+        let violations = MissingRule().validation(projectFiles: [projectFile], localizationFiles: [englishLocalization])
         XCTAssert(violations.first?.rule is MissingRule, "Should throw an error for missing key")
     }
 
     func testDeadKeys() {
-        let violations = validators.validateDeadKeys(from: [projectFile], in: [englishLocalization])
+        let violations = DeadRule().validation(projectFiles: [projectFile], localizationFiles: [englishLocalization])
         XCTAssert(violations.filter({ $0.rule is DeadRule }).count == 2, "Should throw a warning for dead key")
     }
 }

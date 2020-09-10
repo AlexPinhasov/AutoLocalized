@@ -55,8 +55,22 @@ final class LocalizationTests: XCTestCase {
             "base" = "Seconds Duplicate";
         """
         englishLocalization = setupFile(with: content, for: englishLocalizationFilePath)
-        let violations = validators.validateDuplicateKeys(in: [englishLocalization])
-        XCTAssert(violations.filter({ $0.rule is DuplicateRule }).count == 4, "No Duplicates found")
+        let violations = DuplicateKeyRule().validation(projectFiles: [], localizationFiles: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule is DuplicateKeyRule }).count == 4, "No Duplicates keys found")
+    }
+
+    func testSameValueDifferentKeysViolation() {
+        let content: String =
+        """
+            "candle" = "Candle";
+            "about" = "Yes";
+            "title" = "Yes";
+            "base" = "No";
+            "base" = "Seconds Duplicate";
+        """
+        englishLocalization = setupFile(with: content, for: englishLocalizationFilePath)
+        let violations = DuplicateValueRule().validation(projectFiles: [], localizationFiles: [englishLocalization])
+        XCTAssert(violations.filter({ $0.rule is DuplicateValueRule }).count == 2, "No Duplicates values found")
     }
 
     func testAllLocalizationFilesKeysMatch() {
@@ -68,7 +82,7 @@ final class LocalizationTests: XCTestCase {
         """
         englishLocalization = setupFile(with: content, for: englishLocalizationFilePath)
         spanishLocalization = setupFile(with: content, for: spanishLocalizationFilePath)
-        let violations = validators.validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
+        let violations = MatchRule().validation(projectFiles: [], localizationFiles: [englishLocalization, spanishLocalization])
         XCTAssert(violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
@@ -87,7 +101,7 @@ final class LocalizationTests: XCTestCase {
         """
         englishLocalization = setupFile(with: englishContent, for: englishLocalizationFilePath)
         spanishLocalization = setupFile(with: spanishContent, for: spanishLocalizationFilePath)
-        let violations = validators.validateLocalizationKeysMatch(in: [englishLocalization, spanishLocalization])
+        let violations = MatchRule().validation(projectFiles: [], localizationFiles: [englishLocalization, spanishLocalization])
         XCTAssert(!violations.filter({ $0.rule is MatchRule }).isEmpty, "Localization files dont match")
     }
 
