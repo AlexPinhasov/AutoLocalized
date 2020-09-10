@@ -8,7 +8,7 @@
 public enum Violation {
     case error(Rule), warning(Rule)
 
-    var rawValue: String {
+    public var rawValue: String {
         switch self {
         case .error: return "error"
         case .warning: return "warning"

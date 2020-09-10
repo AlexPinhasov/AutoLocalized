@@ -22,4 +22,4 @@ group.wait()
 print(violations: violations)
 
 print("Finished with \(violations.isEmpty ? "SUCCESS ✅" : "\(violations.count) violations ❌")")
-violations.isEmpty ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
+violations.filter({ $0.rawValue == "error" }).isEmpty ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE)
