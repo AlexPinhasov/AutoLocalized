@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DuplicateRule: Rule {
+public struct DuplicateKeyRule: Rule {
     public var name: String = "duplicateKey"
     public var description: String = "Search for duplicate keys in a localization file"
     public var row: Row
