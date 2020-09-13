@@ -67,7 +67,7 @@ swift run -c release AutoLocalized ${PROJECT_DIR}/${PROJECT_NAME}
 ```
 
 3. <b>Build the project, in your project file you will find a ".autolocalized.yml" configuration file.</b>
-* If you get an "error:invalid Access" error after building, just build agian it will go away.
+* If you get an "error:invalid Access" error after building, just build agian it will go away. (SPM bug)
 
 ## Configuration (.autolocalized.yml)
 
