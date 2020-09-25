@@ -35,7 +35,7 @@ AutoLocalized scans your project and search for your localization files and proj
 
 ##
 To Do's:
-- [x] Finish README.md
+- [x] ~~Finish README.md~~
 - [x] ~~Add support for excluding directories.~~
 - [x] ~~Add support for custom file extension regex.~~
 - [ ] Add support for custom Rules and Validation methods.
