@@ -35,12 +35,12 @@ AutoLocalized scans your project and search for your localization files and proj
 
 ##
 To Do's:
-- [ ] Add support for custom Rules and Validation methods.
+- [x] Finish README.md
 - [x] ~~Add support for excluding directories.~~
 - [x] ~~Add support for custom file extension regex.~~
+- [ ] Add support for custom Rules and Validation methods.
 - [ ] Identify a value is in the correct language of the localization file.
 - [ ] Add Wiki
-- [ ] Finish README.md
 - [ ] Add build and test pass marks
 
 ## Installation
