@@ -33,16 +33,6 @@ AutoLocalized scans your project and search for your localization files and proj
 <b>For every project file found the following is executed:</b>
 - If a localization key is used in the file but missing from the localization files, show a warning for the dead key.
 
-##
-To Do's:
-- [x] ~~Finish README.md~~
-- [x] ~~Add support for excluding directories.~~
-- [x] ~~Add support for custom file extension regex.~~
-- [ ] Add support for custom Rules and Validation methods.
-- [ ] Identify a value is in the correct language of the localization file.
-- [ ] Add Wiki
-- [ ] Add build and test pass marks
-
 ## Installation
 <p align="center">
 <img src="/Images/spi.png" width="100" height="100">
@@ -125,7 +115,7 @@ In your "Build report" in Xcode, you will see all the files that were found usin
 
 ## Author
 
-AlexPinhasov, alex5872205@gmail.com
+AlexPinhasov, alexp.software@gmail.com
 
 ## License
 
